@@ -85,31 +85,22 @@ echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
    home-manager switch --flake ~/.config/nix#default
 
    # On Linux ARM64
-   home-manager switch --flake ~/.config/nix#linux-arm
+   home-manager switch --flake ~/.config/nix#archlinux-arm
 
    # On macOS Intel
-   home-manager switch --flake ~/.config/nix#darwin
+   home-manager switch --flake ~/.config/nix#macos-intel
 
    # On macOS ARM (Apple Silicon)
-   home-manager switch --flake ~/.config/nix#darwin-arm
+   home-manager switch --flake ~/.config/nix#macos
    ```
 
 ## Available Profiles
 
-The configuration has explicit profiles for each platform:
-
-**Primary profiles:**
-- `archlinux` - x86_64 Arch Linux (recommended)
+- `archlinux` - x86_64 Arch Linux
 - `archlinux-arm` - ARM64 Arch Linux
-- `macos` - ARM64 macOS (Apple Silicon, recommended)
+- `macos` - ARM64 macOS (Apple Silicon)
 - `macos-intel` - x86_64 macOS (Intel)
-- `default` - x86_64 Arch Linux
-
-**Backwards compatibility:**
-- `linux` - Same as `archlinux`
-- `linux-arm` - Same as `archlinux-arm`
-- `darwin` - Same as `macos-intel`
-- `darwin-arm` - Same as `macos`
+- `default` - x86_64 Arch Linux (same as `archlinux`)
 
 ## SSH Key Setup
 

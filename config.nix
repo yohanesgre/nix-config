@@ -13,7 +13,7 @@
   # ============================================================================
 
   # Set to true to install Flutter, Android Studio, and Android SDK tools
-  enableFlutter = false;
+  enableFlutter = true;
 
   # Flutter SDK URL
   # Update this to the latest stable version from:

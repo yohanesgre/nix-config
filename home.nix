@@ -82,6 +82,11 @@ in
         source = ./scripts/fix-royuan-keyboard.sh;
         executable = true;
       };
+      # Arch packages installation script (Linux only)
+      ".local/bin/install-arch-packages.sh" = {
+        source = ./scripts/install-arch-packages.sh;
+        executable = true;
+      };
     })
     (lib.mkIf enableFlutter {
       # Android SDK setup script (when Flutter is enabled)
@@ -350,16 +355,9 @@ in
       '';
     }
     (lib.mkIf isLinux {
-      # Auto-run: Fix ROYUAN keyboard (Linux only, every time)
-      autoFixKeyboard = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        if [ -f "${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard" ]; then
-          echo "⌨️  Applying ROYUAN keyboard fixes..."
-          $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard || echo "⚠️  Keyboard fix failed"
-        fi
-      '';
-
       # Auto-run: Install Arch packages (first time only)
-      autoInstallArchPackages = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      # This must run after linkGeneration to ensure scripts are in place
+      autoInstallArchPackages = lib.hm.dag.entryAfter ["linkGeneration"] ''
         MARKER_FILE="${config.home.homeDirectory}/.local/share/nix-home-manager/arch-packages-installed"
         if [ ! -f "$MARKER_FILE" ]; then
           echo "📦 First-time setup: Installing Arch packages..."
@@ -370,6 +368,15 @@ in
           else
             echo "⚠️  Package installation failed. Run manually: install-arch-packages.sh"
           fi
+        fi
+      '';
+
+      # Auto-run: Fix ROYUAN keyboard (Linux only, every time)
+      # This must run after autoInstallArchPackages to ensure usbutils is installed
+      autoFixKeyboard = lib.hm.dag.entryAfter ["autoInstallArchPackages"] ''
+        if [ -f "${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard" ]; then
+          echo "⌨️  Applying ROYUAN keyboard fixes..."
+          $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard || echo "⚠️  Keyboard fix failed"
         fi
       '';
     })

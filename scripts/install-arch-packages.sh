@@ -4,6 +4,9 @@
 
 set -e
 
+# Ensure we have access to system binaries
+export PATH="/usr/bin:/usr/sbin:$PATH"
+
 echo "🔧 Installing packages via pacman..."
 
 # Core utilities (likely already installed, but ensuring)
@@ -14,6 +17,7 @@ CORE_PACKAGES=(
     unzip
     zip
     xz
+    usbutils  # Provides lsusb for USB device detection
 )
 
 # Development tools

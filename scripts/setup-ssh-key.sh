@@ -2,6 +2,9 @@
 
 set -e
 
+# Ensure we have access to system binaries
+export PATH="/usr/bin:/usr/sbin:$PATH"
+
 echo "=== SSH Key Setup for GitHub ==="
 echo
 

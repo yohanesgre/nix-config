@@ -9,6 +9,9 @@
 
 set -e
 
+# Ensure we have access to system binaries
+export PATH="/usr/bin:/usr/sbin:$PATH"
+
 # Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -36,9 +39,25 @@ print_header() {
 check_keyboard() {
     echo -e "${YELLOW}Checking for ROYUAN OLV75 keyboard...${NC}"
 
-    if lsusb | grep -q "${VENDOR_ID}:${PRODUCT_ID}"; then
+    # Find lsusb command
+    LSUSB_CMD=""
+    if command -v lsusb &> /dev/null; then
+        LSUSB_CMD="lsusb"
+    elif [ -x /usr/bin/lsusb ]; then
+        LSUSB_CMD="/usr/bin/lsusb"
+    fi
+
+    if [ -z "$LSUSB_CMD" ]; then
+        echo -e "${RED}✗ lsusb command not found${NC}"
+        echo "  Please install usbutils package:"
+        echo "    On Arch/CachyOS: sudo pacman -S usbutils"
+        echo "    Or run: home-manager switch --flake ~/.config/nix#archlinux"
+        return 1
+    fi
+
+    if $LSUSB_CMD | grep -q "${VENDOR_ID}:${PRODUCT_ID}"; then
         echo -e "${GREEN}✓ ROYUAN OLV75 keyboard detected${NC}"
-        lsusb | grep "${VENDOR_ID}:${PRODUCT_ID}"
+        $LSUSB_CMD | grep "${VENDOR_ID}:${PRODUCT_ID}"
         return 0
     else
         echo -e "${RED}✗ ROYUAN OLV75 keyboard not detected${NC}"

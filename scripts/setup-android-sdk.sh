@@ -5,6 +5,9 @@
 
 set -e  # Exit on error
 
+# Ensure we have access to system binaries
+export PATH="/usr/bin:/usr/sbin:$PATH"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -29,10 +32,12 @@ if [[ -z "$ANDROID_HOME" ]]; then
     exit 1
 fi
 
-# Create Android SDK directory
+# Create SDK directories
 ANDROID_SDK_DIR="$HOME/Developments/Sdk/android-sdk"
-log_info "Creating Android SDK directory: $ANDROID_SDK_DIR"
+FLUTTER_SDK_DIR="$HOME/Developments/Sdk/flutter"
+log_info "Creating SDK directories..."
 mkdir -p "$ANDROID_SDK_DIR"
+mkdir -p "$HOME/Developments/Sdk"
 
 # Download and install Android command-line tools
 if [[ ! -d "$ANDROID_SDK_DIR/cmdline-tools/latest" ]]; then
@@ -81,6 +86,33 @@ sdkmanager --install \
     "system-images;android-34;google_apis;x86_64" || log_warning "Some packages may have failed to install"
 
 log_success "Android SDK packages installed"
+
+# Download and install Flutter SDK
+if [[ ! -d "$FLUTTER_SDK_DIR/bin" ]]; then
+    log_info "Downloading Flutter SDK..."
+
+    # Use environment variable or fall back to default
+    FLUTTER_URL="${FLUTTER_SDK_URL:-https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz}"
+    TEMP_DIR=$(mktemp -d)
+
+    cd "$TEMP_DIR"
+    curl -o flutter.tar.xz "$FLUTTER_URL"
+
+    log_info "Extracting Flutter SDK..."
+    tar -xf flutter.tar.xz -C "$HOME/Developments/Sdk/"
+
+    # Clean up
+    rm flutter.tar.xz
+    cd -
+    rm -rf "$TEMP_DIR"
+
+    log_success "Flutter SDK installed"
+else
+    log_success "Flutter SDK already installed"
+fi
+
+# Set up Flutter path for this script
+export PATH="$FLUTTER_SDK_DIR/bin:$PATH"
 
 # Create and configure AVD (Android Virtual Device)
 log_info "Creating Android Virtual Device (AVD)..."
