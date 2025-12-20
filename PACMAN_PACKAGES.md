@@ -52,6 +52,23 @@ yay -S ghostty
 Keep these in Nix as they're not available/recommended via pacman:
 - `claude-code` - Official Claude Code CLI (Nix only)
 - `nix-index` - Nix-specific tool
+- `fastfetch` - Cross-platform system info tool
+
+## Optional: GUI Apps via Nix
+
+You can optionally install VSCode and Ghostty via Nix instead of pacman/AUR by setting `useNixForGuiApps = true` in `config.nix`.
+
+**Pros of using Nix for GUI apps:**
+- ✅ Version pinning and reproducibility
+- ✅ Easy rollback
+- ✅ Consistent across Linux and macOS
+
+**Cons of using Nix for GUI apps:**
+- ❌ May have desktop integration issues
+- ❌ Ghostty has OpenGL issues on some systems (pacman version works better)
+- ❌ Larger Nix store size
+
+**Recommendation:** Use pacman/AUR for GUI apps on Arch Linux for better system integration.
 
 ## Quick Install
 

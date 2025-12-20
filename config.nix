@@ -9,6 +9,14 @@
   username = "example";
 
   # ============================================================================
+  # Package Management (Linux only)
+  # ============================================================================
+
+  # Set to true to install GUI apps via Nix instead of pacman/AUR
+  # Useful if you want Nix-managed versions for reproducibility
+  useNixForGuiApps = false;  # false = use pacman/AUR (recommended for Arch)
+
+  # ============================================================================
   # Flutter Development Environment
   # ============================================================================
 

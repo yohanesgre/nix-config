@@ -18,6 +18,7 @@ let
     else "user";
   enableFlutter = userConfig.enableFlutter or false;
   enableGaming = userConfig.enableGaming or false;
+  useNixForGuiApps = userConfig.useNixForGuiApps or false;
 in
 {
   # Home Manager configuration
@@ -56,6 +57,10 @@ in
     # Most packages should be installed via pacman to avoid conflicts
     # See PACMAN_PACKAGES.md for the full list
     # Run: ~/.config/nix/scripts/install-arch-packages.sh
+  ] ++ lib.optionals (isLinux && useNixForGuiApps) [
+    # Optional: GUI apps via Nix on Linux (if useNixForGuiApps = true)
+    vscode
+    ghostty
   ] ++ lib.optionals enableFlutter [
     # Flutter development environment
     jdk17
