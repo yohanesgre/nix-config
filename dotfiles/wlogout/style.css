@@ -1,0 +1,72 @@
+* {
+	background-image: none;
+	box-shadow: none;
+}
+
+window {
+	background-color: rgba(17, 17, 27, 0.95);
+}
+
+button {
+	background-color: rgba(30, 30, 46, 0.4);
+	border: 1px solid rgba(205, 214, 244, 0.12);
+	border-radius: 6px;
+	color: rgba(205, 214, 244, 0.8);
+	font-family: "JetBrainsMono Nerd Font", sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	margin: 10px;
+	padding: 20px;
+	min-width: 90px;
+	min-height: 90px;
+}
+
+button:hover {
+	background-color: rgba(49, 50, 68, 0.6);
+	border-color: rgba(205, 214, 244, 0.25);
+	color: rgba(205, 214, 244, 1);
+}
+
+button:focus,
+button:active {
+	background-color: rgba(137, 180, 250, 0.15);
+	border-color: rgba(137, 180, 250, 0.4);
+	color: rgba(137, 180, 250, 1);
+	outline: none;
+}
+
+/* Icon placement using ::before pseudo-element */
+#lock::before {
+	content: "🔒";
+	font-size: 32px;
+	display: block;
+	margin-bottom: 8px;
+}
+
+#logout::before {
+	content: "󰍃";
+	font-size: 32px;
+	display: block;
+	margin-bottom: 8px;
+}
+
+#suspend::before {
+	content: "󰒲";
+	font-size: 32px;
+	display: block;
+	margin-bottom: 8px;
+}
+
+#reboot::before {
+	content: "󰜉";
+	font-size: 32px;
+	display: block;
+	margin-bottom: 8px;
+}
+
+#shutdown::before {
+	content: "⏻";
+	font-size: 32px;
+	display: block;
+	margin-bottom: 8px;
+}

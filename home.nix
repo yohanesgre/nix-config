@@ -20,6 +20,11 @@ let
   enableGaming = userConfig.enableGaming or false;
 in
 {
+  # Import Hyprland configuration on Linux
+  imports = [
+    ./hyprland.nix
+  ];
+
   # Home Manager configuration
   home.username = username;
   home.homeDirectory = if isDarwin then "/Users/${username}" else "/home/${username}";

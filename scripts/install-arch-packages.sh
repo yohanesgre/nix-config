@@ -34,6 +34,27 @@ ZSH_PACKAGES=(
     zsh-history-substring-search
 )
 
+# Hyprland and Wayland ecosystem
+HYPRLAND_PACKAGES=(
+    hyprland
+    xdg-desktop-portal-hyprland
+    swww                    # Wallpaper daemon with smooth transitions
+    wofi                    # Application launcher
+    wlogout                 # Logout menu
+    dunst                   # Notification daemon
+    grim                    # Screenshot tool
+    slurp                   # Screen area selection
+    wl-clipboard            # Wayland clipboard utilities
+    cliphist                # Clipboard history manager
+    brightnessctl           # Brightness control
+    playerctl               # Media player control
+    pamixer                 # PulseAudio mixer
+    polkit-kde-agent        # Polkit authentication agent
+    qt5-wayland             # Qt5 Wayland support
+    qt6-wayland             # Qt6 Wayland support
+    dolphin                 # File manager (from your config)
+)
+
 # Gaming (optional)
 GAMING_PACKAGES=(
     wine
@@ -52,7 +73,8 @@ FONT_PACKAGES=(
 # AUR packages (requires yay or paru)
 AUR_PACKAGES=(
     visual-studio-code-bin
-    ghostty  # Terminal with GPU acceleration (fixes OpenGL issues from Nix)
+    ghostty                 # Terminal with GPU acceleration
+    matugen                 # Color theme generator for wallpapers
 )
 
 echo ""
@@ -66,6 +88,10 @@ sudo pacman -S --needed --noconfirm "${DEV_PACKAGES[@]}"
 echo ""
 echo "📦 Installing Zsh plugins..."
 sudo pacman -S --needed --noconfirm "${ZSH_PACKAGES[@]}"
+
+echo ""
+echo "📦 Installing Hyprland and Wayland ecosystem..."
+sudo pacman -S --needed --noconfirm "${HYPRLAND_PACKAGES[@]}"
 
 echo ""
 echo "📦 Installing fonts..."
@@ -91,7 +117,8 @@ else
     echo ""
     echo "📦 AUR packages (requires yay or paru):"
     echo "   - visual-studio-code-bin"
-    echo "   - ghostty (if not already available)"
+    echo "   - ghostty"
+    echo "   - matugen (for wallpaper color themes)"
     echo ""
     read -p "Install AUR packages with yay? [y/N]: " -n 1 -r
     echo
@@ -113,5 +140,6 @@ echo ""
 echo "✅ Package installation complete!"
 echo ""
 echo "Next steps:"
-echo "1. Remove these packages from ~/.config/nix/home.nix"
-echo "2. Run: home-manager switch --flake ~/.config/nix#default"
+echo "1. Reload Hyprland or logout/login to apply changes"
+echo "2. Test wallpaper switching with Super + Shift + W"
+echo "3. Your wallpaper will auto-load on next Hyprland startup"
