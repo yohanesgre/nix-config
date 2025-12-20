@@ -88,15 +88,22 @@ echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
    home-manager switch --flake ~/.config/nix#darwin-arm
    ```
 
-## Available Configurations
+## Available Profiles
 
-The configuration automatically detects your username from `$USER`:
+The configuration has explicit profiles for each platform:
 
-- `linux` - x86_64 Linux
-- `linux-arm` - ARM64 Linux
-- `darwin` - x86_64 macOS (Intel)
-- `darwin-arm` - ARM64 macOS (Apple Silicon)
-- `default` - Default (x86_64 Linux)
+**Primary profiles:**
+- `archlinux` - x86_64 Arch Linux (recommended)
+- `archlinux-arm` - ARM64 Arch Linux
+- `macos` - ARM64 macOS (Apple Silicon, recommended)
+- `macos-intel` - x86_64 macOS (Intel)
+- `default` - x86_64 Arch Linux
+
+**Backwards compatibility:**
+- `linux` - Same as `archlinux`
+- `linux-arm` - Same as `archlinux-arm`
+- `darwin` - Same as `macos-intel`
+- `darwin-arm` - Same as `macos`
 
 ## SSH Key Setup
 

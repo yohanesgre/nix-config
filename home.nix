@@ -260,8 +260,10 @@ in
       c = "clear";
       n = "ninja";
 
-      # Home-manager shortcuts
-      hm = "home-manager switch --flake ~/.config/nix#default";
+      # Home-manager shortcuts (platform-aware)
+      hm = if isLinux
+        then "home-manager switch --flake ~/.config/nix#archlinux"
+        else "home-manager switch --flake ~/.config/nix#macos";
       hme = "$EDITOR ~/.config/nix/home.nix";
     } // lib.optionalAttrs isLinux {
       # Linux-only aliases (from CachyOS config)

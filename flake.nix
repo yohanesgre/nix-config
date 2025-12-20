@@ -43,15 +43,19 @@
         };
       };
     in {
-      # Linux configurations
+      # Platform-specific profiles
+      homeConfigurations."archlinux" = mkHomeConfiguration "x86_64-linux" systems.x86_64-linux;
+      homeConfigurations."archlinux-arm" = mkHomeConfiguration "aarch64-linux" systems.aarch64-linux;
+      homeConfigurations."macos" = mkHomeConfiguration "aarch64-darwin" systems.aarch64-darwin;
+      homeConfigurations."macos-intel" = mkHomeConfiguration "x86_64-darwin" systems.x86_64-darwin;
+
+      # Backwards compatibility aliases
       homeConfigurations."linux" = mkHomeConfiguration "x86_64-linux" systems.x86_64-linux;
       homeConfigurations."linux-arm" = mkHomeConfiguration "aarch64-linux" systems.aarch64-linux;
-
-      # macOS configurations
       homeConfigurations."darwin" = mkHomeConfiguration "x86_64-darwin" systems.x86_64-darwin;
       homeConfigurations."darwin-arm" = mkHomeConfiguration "aarch64-darwin" systems.aarch64-darwin;
 
-      # Default configuration (x86_64 Linux)
+      # Default configuration (x86_64 Linux / Arch)
       homeConfigurations.default = mkHomeConfiguration "x86_64-linux" systems.x86_64-linux;
     };
 }
