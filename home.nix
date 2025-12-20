@@ -28,22 +28,33 @@ in
 
   # Packages to install
   home.packages = with pkgs; [
-    # Nix-specific packages (not available/recommended via pacman)
+    # Nix-specific packages (always install via Nix)
     claude-code
     nix-index
-
-    # Cross-platform packages (keep in Nix for version control)
     fastfetch
-
-    # NOTE: The following packages should be installed via pacman instead:
-    # - Core utilities: git, curl, vim, unzip, zip, xz
-    # - Zsh plugins: zsh-autosuggestions, zsh-syntax-highlighting, zsh-history-substring-search
-    # - Development tools: gh, btop, fzf
-    # - Gaming: wine, winetricks, steam, protontricks
-    # - Fonts: ttf-firacode-nerd, ttf-jetbrains-mono-nerd, ttf-meslo-nerd (via pacman)
-    # - GUI apps: vscode (visual-studio-code-bin via AUR)
-    # - Terminals: ghostty (has OpenGL issues with Nix, install via AUR instead)
-    #
+  ] ++ lib.optionals isDarwin [
+    # macOS: Install all packages via Nix (no pacman available)
+    btop
+    curl
+    fzf
+    gh
+    ghostty
+    git
+    nerd-fonts.fira-code
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.meslo-lg
+    unzip
+    vim
+    vscode
+    xz
+    zip
+    zsh-autosuggestions
+    zsh-history-substring-search
+    zsh-syntax-highlighting
+  ] ++ lib.optionals isLinux [
+    # Linux (Arch/CachyOS): Install minimal set via Nix
+    # Most packages should be installed via pacman to avoid conflicts
+    # See PACMAN_PACKAGES.md for the full list
     # Run: ~/.config/nix/scripts/install-arch-packages.sh
   ] ++ lib.optionals enableFlutter [
     # Flutter development environment
@@ -88,16 +99,20 @@ in
   # Environment variables
   home.sessionVariables = {
     EDITOR = "vim";
-    # FZF_BASE = "${pkgs.fzf}/share/fzf";  # Use system fzf from pacman
-    FZF_BASE = "/usr/share/fzf";
     HISTCONTROL = "ignoreboth";
     HISTIGNORE = "&:[bf]g:c:clear:history:exit:q:pwd:* --help";
     LESS_TERMCAP_md = "$(tput bold 2> /dev/null; tput setaf 2 2> /dev/null)";
     LESS_TERMCAP_me = "$(tput sgr0 2> /dev/null)";
-    # TERMINAL = "ghostty";  # Removed: install via pacman/AUR instead (OpenGL issues with Nix)
+  } // lib.optionalAttrs isDarwin {
+    # macOS: Use Nix-provided packages
+    FZF_BASE = "${pkgs.fzf}/share/fzf";
+    TERMINAL = "ghostty";
+  } // lib.optionalAttrs isLinux {
+    # Linux (Arch): Use system packages from pacman
+    FZF_BASE = "/usr/share/fzf";
+    # TERMINAL not set - using system ghostty
     # Arch Linux integration (from Arch Wiki)
     LOCALE_ARCHIVE = "/usr/lib/locale/locale-archive";
-  } // lib.optionalAttrs isLinux {
     # Desktop integration on Linux (from Arch Wiki)
     XDG_DATA_DIRS = "${config.home.homeDirectory}/.nix-profile/share:$XDG_DATA_DIRS";
   } // lib.optionalAttrs enableFlutter {
@@ -278,14 +293,21 @@ in
       # Display red dots whilst waiting for completion
       COMPLETION_WAITING_DOTS="true"
 
-      # Load zsh-history-substring-search (from pacman installation)
-      # Note: Install via: sudo pacman -S zsh-history-substring-search
-      if [ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]; then
-        source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
-        # Bind keys for history substring search
-        bindkey '^[[A' history-substring-search-up
-        bindkey '^[[B' history-substring-search-down
-      fi
+      # Load zsh-history-substring-search
+      ${lib.optionalString isDarwin ''
+        # macOS: Use Nix-provided plugin
+        source ${pkgs.zsh-history-substring-search}/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+      ''}
+      ${lib.optionalString isLinux ''
+        # Linux (Arch): Use system-provided plugin from pacman
+        if [ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]; then
+          source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+        fi
+      ''}
+
+      # Bind keys for history substring search
+      bindkey '^[[A' history-substring-search-up
+      bindkey '^[[B' history-substring-search-down
 
       # Add local bin to PATH
       export PATH="$HOME/.local/bin:$PATH"

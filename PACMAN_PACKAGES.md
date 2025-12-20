@@ -2,6 +2,8 @@
 
 This document lists packages that should be installed via pacman instead of Nix to avoid conflicts.
 
+**Note:** This only applies to Linux (Arch/CachyOS). On macOS, all packages are installed via Nix since pacman is not available.
+
 ## Core Utilities (pacman)
 
 Already installed on most Arch systems:

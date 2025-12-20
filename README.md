@@ -178,15 +178,21 @@ home-manager switch --flake ~/.config/nix#default
 
 ## Platform-Specific Notes
 
-### Linux
+### Linux (Arch/CachyOS)
+- **Hybrid package management**: Essential packages via pacman, Nix-specific tools via Nix
+- **Optimized for Arch**: Follows Arch Wiki best practices for Nix integration
+- **Performance optimizations**: Multi-core builds, locale fixes
 - Includes flatpak with auto-updates
 - Optional gaming packages (Steam, Wine) via `enableGaming`
 - CachyOS-inspired aliases and settings
+- See [PACMAN_PACKAGES.md](./PACMAN_PACKAGES.md) for package management strategy
 
 ### macOS
+- **Full Nix package management**: All packages installed via Nix
 - Automatically detects platform
 - Uses appropriate CPU count for make/ninja
 - Homebrew integration via alias
+- No conflicts with system package managers
 
 ## Customization
 
