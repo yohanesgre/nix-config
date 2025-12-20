@@ -4,13 +4,9 @@ My personal [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-
 
 ## 📚 Documentation
 
-- **[docs/PROFILES.md](docs/PROFILES.md)** - Flake profiles (#archlinux, #macos, etc.)
-- **[docs/PLATFORM_COMPATIBILITY.md](docs/PLATFORM_COMPATIBILITY.md)** - Platform setup
-- **[docs/PACMAN_PACKAGES.md](docs/PACMAN_PACKAGES.md)** - Arch package management
-- **[docs/VSCODE_OPTIONS.md](docs/VSCODE_OPTIONS.md)** - VSCode options
-- **[docs/FLUTTER_SETUP.md](docs/FLUTTER_SETUP.md)** - Flutter development
-- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Configuration internals
-- **[docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md)** - Managing secrets
+- **[docs/GUIDE.md](docs/GUIDE.md)** - User guide (profiles, platform setup)
+- **[docs/REFERENCE.md](docs/REFERENCE.md)** - Technical reference (architecture, packages)
+- **[docs/ADVANCED.md](docs/ADVANCED.md)** - Advanced topics (Flutter, secrets, auto-run)
 
 ## Features
 
@@ -150,7 +146,7 @@ All optional features can be enabled/disabled in `config.nix`:
 | `flutterSdkUrl` | string | Latest stable | Flutter SDK download URL |
 | `androidCmdlineToolsUrl` | string | Latest Linux tools | Android SDK command-line tools download URL |
 
-See [docs/FLUTTER_SETUP.md](docs/FLUTTER_SETUP.md) for Flutter-specific setup instructions.
+See [docs/ADVANCED.md](docs/ADVANCED.md) for Flutter-specific setup instructions.
 
 ### Git Configuration
 
@@ -178,13 +174,9 @@ This keeps your personal git information out of version control while allowing g
 ├── README.md                   # This file
 ├── .gitignore                  # Git ignore rules
 ├── docs/                       # Documentation
-│   ├── PROFILES.md             # Flake profiles guide
-│   ├── PLATFORM_COMPATIBILITY.md
-│   ├── ARCHITECTURE.md
-│   ├── PACMAN_PACKAGES.md
-│   ├── VSCODE_OPTIONS.md
-│   ├── FLUTTER_SETUP.md
-│   └── SECRETS_MANAGEMENT.md
+│   ├── GUIDE.md                # User guide
+│   ├── REFERENCE.md            # Technical reference
+│   └── ADVANCED.md             # Advanced topics
 └── scripts/                    # Helper scripts
     ├── setup-ssh-key.sh
     ├── fix-royuan-keyboard.sh
@@ -211,7 +203,7 @@ home-manager switch --flake ~/.config/nix#default
 - Includes flatpak with auto-updates
 - Optional gaming packages (Steam, Wine) via `enableGaming`
 - CachyOS-inspired aliases and settings
-- See [PACMAN_PACKAGES.md](docs/PACMAN_PACKAGES.md) for package management strategy
+- See [docs/REFERENCE.md](docs/REFERENCE.md) for package management strategy
 
 ### macOS
 - **Full Nix package management**: All packages installed via Nix
