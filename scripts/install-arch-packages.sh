@@ -67,31 +67,41 @@ echo ""
 echo "📦 Installing fonts..."
 sudo pacman -S --needed --noconfirm "${FONT_PACKAGES[@]}"
 
-echo ""
-read -p "Install gaming packages (wine, steam, etc.)? [y/N]: " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "📦 Installing gaming packages..."
-    sudo pacman -S --needed --noconfirm "${GAMING_PACKAGES[@]}"
-fi
+# Check if running in auto mode (from home-manager activation)
+AUTO_MODE="${AUTO_MODE:-false}"
 
-echo ""
-echo "📦 AUR packages (requires yay or paru):"
-echo "   - visual-studio-code-bin"
-echo "   - ghostty (if not already available)"
-echo ""
-read -p "Install AUR packages with yay? [y/N]: " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    if command -v yay &> /dev/null; then
-        yay -S --needed --noconfirm "${AUR_PACKAGES[@]}"
-    elif command -v paru &> /dev/null; then
-        paru -S --needed --noconfirm "${AUR_PACKAGES[@]}"
-    else
-        echo "⚠️  yay or paru not found. Please install AUR packages manually:"
-        for pkg in "${AUR_PACKAGES[@]}"; do
-            echo "   - $pkg"
-        done
+if [ "$AUTO_MODE" = "true" ]; then
+    # Auto mode: Skip gaming and AUR (can install manually later)
+    echo "ℹ️  Auto-mode: Skipping gaming and AUR packages"
+    echo "   Run manually with 'install-arch-packages.sh' to install gaming/AUR packages"
+else
+    # Interactive mode: Ask user
+    echo ""
+    read -p "Install gaming packages (wine, steam, etc.)? [y/N]: " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "📦 Installing gaming packages..."
+        sudo pacman -S --needed --noconfirm "${GAMING_PACKAGES[@]}"
+    fi
+
+    echo ""
+    echo "📦 AUR packages (requires yay or paru):"
+    echo "   - visual-studio-code-bin"
+    echo "   - ghostty (if not already available)"
+    echo ""
+    read -p "Install AUR packages with yay? [y/N]: " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if command -v yay &> /dev/null; then
+            yay -S --needed --noconfirm "${AUR_PACKAGES[@]}"
+        elif command -v paru &> /dev/null; then
+            paru -S --needed --noconfirm "${AUR_PACKAGES[@]}"
+        else
+            echo "⚠️  yay or paru not found. Please install AUR packages manually:"
+            for pkg in "${AUR_PACKAGES[@]}"; do
+                echo "   - $pkg"
+            done
+        fi
     fi
 fi
 

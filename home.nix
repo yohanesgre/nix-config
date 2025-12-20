@@ -340,12 +340,39 @@ in
   # Activation scripts
   home.activation = lib.mkMerge [
     {
-      # Notify about available setup scripts
-      showSetupScripts = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        echo "📦 Setup scripts available in ~/.local/bin/:"
-        $DRY_RUN_CMD ls -1 ${config.home.homeDirectory}/.local/bin/setup-* ${config.home.homeDirectory}/.local/bin/fix-* 2>/dev/null || true
+      # Auto-run: Setup SSH key (first time only)
+      autoSetupSshKey = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        SSH_KEY_FILE="${config.home.homeDirectory}/.ssh/id_ed25519"
+        if [ ! -f "$SSH_KEY_FILE" ]; then
+          echo "🔑 No SSH key found, running setup-ssh-key..."
+          $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/setup-ssh-key || echo "⚠️  SSH setup failed or skipped"
+        fi
       '';
     }
+    (lib.mkIf isLinux {
+      # Auto-run: Fix ROYUAN keyboard (Linux only, every time)
+      autoFixKeyboard = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        if [ -f "${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard" ]; then
+          echo "⌨️  Applying ROYUAN keyboard fixes..."
+          $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard || echo "⚠️  Keyboard fix failed"
+        fi
+      '';
+
+      # Auto-run: Install Arch packages (first time only)
+      autoInstallArchPackages = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        MARKER_FILE="${config.home.homeDirectory}/.local/share/nix-home-manager/arch-packages-installed"
+        if [ ! -f "$MARKER_FILE" ]; then
+          echo "📦 First-time setup: Installing Arch packages..."
+          if AUTO_MODE=true $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/install-arch-packages.sh; then
+            mkdir -p "$(dirname "$MARKER_FILE")"
+            touch "$MARKER_FILE"
+            echo "✅ Arch packages installed"
+          else
+            echo "⚠️  Package installation failed. Run manually: install-arch-packages.sh"
+          fi
+        fi
+      '';
+    })
     (lib.mkIf enableFlutter {
       setupAndroidSdk = lib.hm.dag.entryAfter ["installPackages"] ''
         echo ""
