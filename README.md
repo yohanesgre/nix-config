@@ -9,6 +9,7 @@ My personal [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-
 - **Consistent environment**: Same setup across all devices
 - **Git-based dotfiles**: Version-controlled configuration
 - **Automated SSH setup**: Script for easy SSH key generation and GitHub integration
+- **Environment-based configuration**: Use Nix expressions for easy feature toggling
 
 ## What's Included
 
@@ -18,7 +19,8 @@ My personal [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-
 - **Terminal**: ghostty
 - **System tools**: btop, fastfetch, nix-index
 - **Fonts**: Nerd Fonts (FiraCode, JetBrains Mono, Meslo LG)
-- **Linux-only**: flatpak, steam, wine, protontricks
+- **Linux-only**: flatpak
+- **Gaming (optional)**: steam, wine, protontricks (Linux only)
 
 ### Programs Configured
 - **Git**: User info and settings
@@ -29,6 +31,7 @@ My personal [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-
 ### Scripts
 - `setup-ssh-key`: Interactive SSH key setup for GitHub
 - `fix-royuan-keyboard` (Linux): Fix for ROYUAN OLV75 keyboard
+- `setup-android-sdk` (Optional): Android SDK setup for Flutter development
 
 ## Installation
 
@@ -53,41 +56,47 @@ echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
    cd ~/.config/nix
    ```
 
-2. **Customize for your user** (edit `flake.nix`):
+2. **Customize configuration** (edit `config.nix`):
    ```nix
-   # Change this line to your username
-   username = "yohanes";
+   {
+     # Enable optional features
+     enableFlutter = true;
+     enableGaming = true;
+   }
    ```
 
-3. **Update personal info** (edit `home.nix`):
-   ```nix
-   programs.git = {
-     settings = {
-       user.email = "your-email@example.com";
-       user.name = "Your Name";
-     };
-   };
+3. **Set up Git user info** (add to `~/.zshrc` or create `~/.zshrc.local`):
+   ```bash
+   export GIT_AUTHOR_EMAIL="your-email@example.com"
+   export GIT_AUTHOR_NAME="Your Name"
+   export GIT_COMMITTER_EMAIL="your-email@example.com"
+   export GIT_COMMITTER_NAME="Your Name"
    ```
 
 4. **Apply the configuration**:
    ```bash
-   # On Linux x86_64
-   home-manager switch --flake ~/.config/nix#yohanes@linux
+   # On Linux x86_64 (default)
+   home-manager switch --flake ~/.config/nix#default
+
+   # On Linux ARM64
+   home-manager switch --flake ~/.config/nix#linux-arm
+
+   # On macOS Intel
+   home-manager switch --flake ~/.config/nix#darwin
 
    # On macOS ARM (Apple Silicon)
-   home-manager switch --flake ~/.config/nix#yohanes@darwin-arm
-
-   # Or use the default (x86_64 Linux)
-   home-manager switch --flake ~/.config/nix#yohanes
+   home-manager switch --flake ~/.config/nix#darwin-arm
    ```
 
 ## Available Configurations
 
-- `username@linux` - x86_64 Linux
-- `username@linux-arm` - ARM64 Linux
-- `username@darwin` - x86_64 macOS (Intel)
-- `username@darwin-arm` - ARM64 macOS (Apple Silicon)
-- `username` - Default (x86_64 Linux)
+The configuration automatically detects your username from `$USER`:
+
+- `linux` - x86_64 Linux
+- `linux-arm` - ARM64 Linux
+- `darwin` - x86_64 macOS (Intel)
+- `darwin-arm` - ARM64 macOS (Apple Silicon)
+- `default` - Default (x86_64 Linux)
 
 ## SSH Key Setup
 
@@ -107,23 +116,54 @@ The script will:
 
 Defined in the configuration:
 
-- `hm` - Apply Home Manager configuration
+- `hm` - Apply Home Manager configuration (`home-manager switch --flake ~/.config/nix#default`)
 - `hme` - Edit home.nix
 - `c` - Clear terminal
 - Linux: `update`, `cleanup`, `jctl`, `rip`
 - macOS: `update` (brew)
 
+## Configuration Options
+
+All optional features can be enabled/disabled in `config.nix`:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enableFlutter` | boolean | `false` | Install Flutter SDK, Android Studio, and JDK 17 |
+| `enableGaming` | boolean | `false` | Install Steam, Wine, and gaming tools (Linux only) |
+| `flutterSdkUrl` | string | Latest stable | Flutter SDK download URL |
+| `androidCmdlineToolsUrl` | string | Latest Linux tools | Android SDK command-line tools download URL |
+
+See [FLUTTER_SETUP.md](./FLUTTER_SETUP.md) for Flutter-specific setup instructions.
+
+### Git Configuration
+
+Git user information is configured via environment variables in your shell:
+
+```bash
+# Add to ~/.zshrc or ~/.zshrc.local
+export GIT_AUTHOR_EMAIL="your-email@example.com"
+export GIT_AUTHOR_NAME="Your Name"
+export GIT_COMMITTER_EMAIL="your-email@example.com"
+export GIT_COMMITTER_NAME="Your Name"
+```
+
+This keeps your personal git information out of version control while allowing git to use these values automatically.
+
 ## File Structure
 
 ```
 .
-├── flake.nix           # Main flake configuration
-├── flake.lock          # Locked dependencies
-├── home.nix            # Home Manager configuration
-├── scripts/            # Helper scripts
+├── flake.nix              # Main flake configuration
+├── flake.lock             # Locked dependencies
+├── home.nix               # Home Manager configuration
+├── config.nix             # User configuration file
+├── scripts/               # Helper scripts
 │   ├── setup-ssh-key.sh
-│   └── fix-royuan-keyboard.sh
-└── README.md
+│   ├── fix-royuan-keyboard.sh
+│   └── setup-android-sdk.sh
+├── README.md              # This file
+├── FLUTTER_SETUP.md       # Flutter setup guide
+└── .gitignore             # Git ignore rules
 ```
 
 ## Updating
@@ -133,14 +173,14 @@ Defined in the configuration:
 nix flake update ~/.config/nix
 
 # Apply updates
-home-manager switch --flake ~/.config/nix#yohanes
+home-manager switch --flake ~/.config/nix#default
 ```
 
 ## Platform-Specific Notes
 
 ### Linux
 - Includes flatpak with auto-updates
-- Gaming packages (Steam, Wine)
+- Optional gaming packages (Steam, Wine) via `enableGaming`
 - CachyOS-inspired aliases and settings
 
 ### macOS

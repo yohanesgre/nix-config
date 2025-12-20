@@ -12,9 +12,6 @@
 
   outputs = { nixpkgs, home-manager, nix-flatpak, ... }:
     let
-      # CUSTOMIZE THIS: Set your username here
-      username = "yohanes";
-
       # Helper function to create home configuration for a system
       mkHomeConfiguration = system: pkgs: home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
@@ -47,14 +44,14 @@
       };
     in {
       # Linux configurations
-      homeConfigurations."${username}@linux" = mkHomeConfiguration "x86_64-linux" systems.x86_64-linux;
-      homeConfigurations."${username}@linux-arm" = mkHomeConfiguration "aarch64-linux" systems.aarch64-linux;
+      homeConfigurations."linux" = mkHomeConfiguration "x86_64-linux" systems.x86_64-linux;
+      homeConfigurations."linux-arm" = mkHomeConfiguration "aarch64-linux" systems.aarch64-linux;
 
       # macOS configurations
-      homeConfigurations."${username}@darwin" = mkHomeConfiguration "x86_64-darwin" systems.x86_64-darwin;
-      homeConfigurations."${username}@darwin-arm" = mkHomeConfiguration "aarch64-darwin" systems.aarch64-darwin;
+      homeConfigurations."darwin" = mkHomeConfiguration "x86_64-darwin" systems.x86_64-darwin;
+      homeConfigurations."darwin-arm" = mkHomeConfiguration "aarch64-darwin" systems.aarch64-darwin;
 
-      # Default configuration (backwards compatibility)
-      homeConfigurations."${username}" = mkHomeConfiguration "x86_64-linux" systems.x86_64-linux;
+      # Default configuration (x86_64 Linux)
+      homeConfigurations.default = mkHomeConfiguration "x86_64-linux" systems.x86_64-linux;
     };
 }

@@ -1,0 +1,7 @@
+# Home Manager result symlinks
+result
+result-*
+
+# Backup files
+*.backup
+*~

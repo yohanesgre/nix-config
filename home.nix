@@ -3,39 +3,54 @@
 let
   isLinux = pkgs.stdenv.isLinux;
   isDarwin = pkgs.stdenv.isDarwin;
+
+  # Load configuration from config.nix file if it exists
+  configFile = ./config.nix;
+  userConfig = if builtins.pathExists configFile
+    then import configFile
+    else {};
+
+  # Optional package configuration
+  # Can be set here or in config.nix file
+  username =
+    if userConfig ? username then userConfig.username
+    else if builtins.getEnv "USER" != "" then builtins.getEnv "USER"
+    else "user";
+  enableFlutter = userConfig.enableFlutter or false;
+  enableGaming = userConfig.enableGaming or false;
 in
 {
   # Home Manager configuration
-  home.username = "yohanes";
-  home.homeDirectory = if isDarwin then "/Users/yohanes" else "/home/yohanes";
+  home.username = username;
+  home.homeDirectory = if isDarwin then "/Users/${username}" else "/home/${username}";
   home.stateVersion = "24.11";
+
 
   # Packages to install
   home.packages = with pkgs; [
-    # Cross-platform packages
-    btop
+    # Nix-specific packages (not available/recommended via pacman)
     claude-code
-    fastfetch
-    fzf
-    gh
-    ghostty
-    git
-    nerd-fonts.fira-code
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.meslo-lg
     nix-index
-    vim
-    vscode
-    zsh-autosuggestions
-    zsh-history-substring-search
-    zsh-syntax-highlighting
-  ] ++ lib.optionals isLinux [
-    # Linux-only packages
-    flatpak
-    protontricks
-    steam
-    wine
-    winetricks
+
+    # Cross-platform packages (keep in Nix for version control)
+    fastfetch
+
+    # NOTE: The following packages should be installed via pacman instead:
+    # - Core utilities: git, curl, vim, unzip, zip, xz
+    # - Zsh plugins: zsh-autosuggestions, zsh-syntax-highlighting, zsh-history-substring-search
+    # - Development tools: gh, btop, fzf
+    # - Gaming: wine, winetricks, steam, protontricks
+    # - Fonts: ttf-firacode-nerd, ttf-jetbrains-mono-nerd, ttf-meslo-nerd (via pacman)
+    # - GUI apps: vscode (visual-studio-code-bin via AUR)
+    # - Terminals: ghostty (has OpenGL issues with Nix, install via AUR instead)
+    #
+    # Run: ~/.config/nix/scripts/install-arch-packages.sh
+  ] ++ lib.optionals enableFlutter [
+    # Flutter development environment
+    jdk17
+  ] ++ lib.optionals (isLinux && enableFlutter) [
+    # Flutter development environment (Linux only)
+    libglvnd
   ];
 
   # Dotfiles management
@@ -57,17 +72,40 @@ in
         executable = true;
       };
     })
+    (lib.mkIf enableFlutter {
+      # Android SDK setup script (when Flutter is enabled)
+      ".local/bin/setup-android-sdk" = {
+        source = ./scripts/setup-android-sdk.sh;
+        executable = true;
+      };
+      # Create Developments directory structure
+      "Developments/Sdk/.keep" = {
+        text = "# This directory contains development SDKs\n";
+      };
+    })
   ];
 
   # Environment variables
   home.sessionVariables = {
     EDITOR = "vim";
-    FZF_BASE = "${pkgs.fzf}/share/fzf";
+    # FZF_BASE = "${pkgs.fzf}/share/fzf";  # Use system fzf from pacman
+    FZF_BASE = "/usr/share/fzf";
     HISTCONTROL = "ignoreboth";
     HISTIGNORE = "&:[bf]g:c:clear:history:exit:q:pwd:* --help";
     LESS_TERMCAP_md = "$(tput bold 2> /dev/null; tput setaf 2 2> /dev/null)";
     LESS_TERMCAP_me = "$(tput sgr0 2> /dev/null)";
-    TERMINAL = "ghostty";
+    # TERMINAL = "ghostty";  # Removed: install via pacman/AUR instead (OpenGL issues with Nix)
+    # Arch Linux integration (from Arch Wiki)
+    LOCALE_ARCHIVE = "/usr/lib/locale/locale-archive";
+  } // lib.optionalAttrs isLinux {
+    # Desktop integration on Linux (from Arch Wiki)
+    XDG_DATA_DIRS = "${config.home.homeDirectory}/.nix-profile/share:$XDG_DATA_DIRS";
+  } // lib.optionalAttrs enableFlutter {
+    # Flutter/Android development environment variables
+    JAVA_HOME = "${pkgs.jdk17}";
+    ANDROID_HOME = "${config.home.homeDirectory}/Developments/Sdk/android-sdk";
+    ANDROID_SDK_ROOT = "${config.home.homeDirectory}/Developments/Sdk/android-sdk";
+    FLUTTER_ROOT = "${config.home.homeDirectory}/Developments/Sdk/flutter";
   };
 
   # Programs configuration
@@ -75,10 +113,6 @@ in
 
   programs.git = {
     enable = true;
-    settings = {
-      user.email = "yohanesgre@gmail.com";
-      user.name = "Yohanes Grethaputra";
-    };
   };
 
   programs.nix-index = {
@@ -207,7 +241,7 @@ in
       n = "ninja";
 
       # Home-manager shortcuts
-      hm = "home-manager switch --flake ~/.config/nix#yohanes";
+      hm = "home-manager switch --flake ~/.config/nix#default";
       hme = "$EDITOR ~/.config/nix/home.nix";
     } // lib.optionalAttrs isLinux {
       # Linux-only aliases (from CachyOS config)
@@ -244,33 +278,66 @@ in
       # Display red dots whilst waiting for completion
       COMPLETION_WAITING_DOTS="true"
 
-      # Load zsh-history-substring-search
-      source ${pkgs.zsh-history-substring-search}/share/zsh-history-substring-search/zsh-history-substring-search.zsh
-
-      # Bind keys for history substring search
-      bindkey '^[[A' history-substring-search-up
-      bindkey '^[[B' history-substring-search-down
+      # Load zsh-history-substring-search (from pacman installation)
+      # Note: Install via: sudo pacman -S zsh-history-substring-search
+      if [ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]; then
+        source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+        # Bind keys for history substring search
+        bindkey '^[[A' history-substring-search-up
+        bindkey '^[[B' history-substring-search-down
+      fi
 
       # Add local bin to PATH
       export PATH="$HOME/.local/bin:$PATH"
+
+      # Git configuration (set these in your ~/.zshrc.local or similar)
+      # export GIT_AUTHOR_EMAIL="your-email@example.com"
+      # export GIT_AUTHOR_NAME="Your Name"
+      # export GIT_COMMITTER_EMAIL="your-email@example.com"
+      # export GIT_COMMITTER_NAME="Your Name"
+
+      ${lib.optionalString enableFlutter ''
+        # Flutter and Android SDK paths
+        export PATH="$FLUTTER_ROOT/bin:$PATH"
+        export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+        export PATH="$ANDROID_HOME/platform-tools:$PATH"
+        export PATH="$ANDROID_HOME/build-tools/34.0.0:$PATH"
+
+        ${lib.optionalString isDarwin ''
+          # Ensure Xcode Command Line Tools are installed on macOS for Flutter
+          if ! xcode-select -p &> /dev/null; then
+            echo "Xcode Command Line Tools not found. Please run: xcode-select --install"
+          fi
+        ''}
+      ''}
     '';
   };
 
-  # Flatpak configuration (Linux only)
-  services.flatpak = lib.mkIf isLinux {
-    enable = true;
-    update.auto = {
-      enable = true;
-      onCalendar = "weekly";
-    };
-    packages = [
-      "app.zen_browser.zen"
-    ];
-    remotes = [
-      {
-        name = "flathub";
-        location = "https://flathub.org/repo/flathub.flatpakrepo";
-      }
-    ];
-  };
+  # Activation scripts
+  home.activation = lib.mkMerge [
+    {
+      # Notify about available setup scripts
+      showSetupScripts = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        echo "📦 Setup scripts available in ~/.local/bin/:"
+        $DRY_RUN_CMD ls -1 ${config.home.homeDirectory}/.local/bin/setup-* ${config.home.homeDirectory}/.local/bin/fix-* 2>/dev/null || true
+      '';
+    }
+    (lib.mkIf enableFlutter {
+      setupAndroidSdk = lib.hm.dag.entryAfter ["installPackages"] ''
+        echo ""
+        echo "🔧 Running Android SDK setup..."
+        export PATH="${pkgs.jdk17}/bin:${pkgs.curl}/bin:${pkgs.unzip}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:$PATH"
+        export ANDROID_HOME="${config.home.homeDirectory}/Developments/Sdk/android-sdk"
+        export ANDROID_SDK_ROOT="${config.home.homeDirectory}/Developments/Sdk/android-sdk"
+        export ANDROID_CMDLINE_TOOLS_URL="${userConfig.androidCmdlineToolsUrl or "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"}"
+        export FLUTTER_SDK_URL="${userConfig.flutterSdkUrl or "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz"}"
+        export JAVA_HOME="${pkgs.jdk17}"
+        $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/setup-android-sdk || echo "⚠️  Android SDK setup failed. You can run 'setup-android-sdk' manually later."
+        echo ""
+      '';
+    })
+  ];
+
+  # Flatpak configuration disabled - use system flatpak instead
+  # Install flatpak apps via: flatpak install flathub app.zen_browser.zen
 }
