@@ -1,16 +1,14 @@
 # VSCode Installation Options on Arch Linux
 
-You have two options for installing VSCode on Arch Linux with this Nix configuration.
+You have two options for installing VSCode on Arch Linux.
 
 ## Option 1: VSCode via pacman/AUR (Recommended)
 
-**Status:** ✅ Currently configured (default)
+**Status:** ✅ Default configuration
 
-**Configuration:**
-```nix
-# In config.nix
-useNixForGuiApps = false;  # Default
-```
+**How it works:**
+- The `#archlinux` profile doesn't install VSCode via Nix
+- Install VSCode manually via pacman/AUR
 
 **Installation:**
 ```bash
@@ -36,16 +34,9 @@ yay -S visual-studio-code-bin
 
 ## Option 2: VSCode via Nix
 
-**Configuration:**
-```nix
-# In config.nix
-useNixForGuiApps = true;
-```
+**How to enable:**
 
-**Installation:**
-```bash
-home-manager switch --flake ~/.config/nix#default
-```
+Add VSCode to the macOS package list in `home.nix`, or create a custom profile.
 
 **Pros:**
 - ✅ Version pinning and reproducibility
@@ -71,14 +62,23 @@ home-manager switch --flake ~/.config/nix#default
    yay -R visual-studio-code-bin
    ```
 
-2. **Enable in config.nix**:
+2. **Add VSCode to home.nix**:
    ```nix
-   useNixForGuiApps = true;
+   # In home.nix, add to the macOS package list:
+   ] ++ lib.optionals isDarwin [
+     vscode  # Add this
+     # ... other macOS packages
+   ]
+
+   # Or add to Linux packages if you want Nix VSCode on Arch:
+   ] ++ lib.optionals isLinux [
+     vscode  # Add this
+   ]
    ```
 
 3. **Apply changes**:
    ```bash
-   home-manager switch --flake ~/.config/nix#default
+   home-manager switch --flake ~/.config/nix#archlinux
    ```
 
 4. **Verify**:
@@ -89,14 +89,14 @@ home-manager switch --flake ~/.config/nix#default
 
 ### Switch back to AUR version
 
-1. **Disable in config.nix**:
+1. **Remove from home.nix**:
    ```nix
-   useNixForGuiApps = false;
+   # Remove vscode from the package list
    ```
 
 2. **Apply changes**:
    ```bash
-   home-manager switch --flake ~/.config/nix#default
+   home-manager switch --flake ~/.config/nix#archlinux
    ```
 
 3. **Install AUR version**:
