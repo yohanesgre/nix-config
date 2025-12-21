@@ -8,6 +8,10 @@
   # Your username (required for flake-based home-manager)
   username = "example";
 
+  # Git Configuration 
+  gitUserName = "";
+  gitUserEmail = "";
+
   # ============================================================================
   # Flutter Development Environment
   # ============================================================================

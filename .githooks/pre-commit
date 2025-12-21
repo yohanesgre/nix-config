@@ -15,6 +15,8 @@ echo "[pre-commit] Found config file, applying defaults..."
 
 sed -i.bak \
     -e 's/username = "[^"]*";/username = "example";/' \
+    -e 's/gitUserName = "[^"]*";/gitUserName = "";/' \
+    -e 's/gitUserEmail = "[^"]*";/gitUserEmail = "";/' \
     -e 's/enableFlutter = [^;]*/enableFlutter = false/' \
     -e 's/enableGaming = [^;]*/enableGaming = false/' \
     -e 's/enableRoyuanKeyboard = [^;]*/enableRoyuanKeyboard = false/' \

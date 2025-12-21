@@ -161,6 +161,8 @@ in
 
   programs.git = {
     enable = true;
+    userName = userConfig.gitUserName or "";
+    userEmail = userConfig.gitUserEmail or "";
   };
 
   programs.nix-index = {
@@ -354,12 +356,6 @@ in
         fi
         rm -f -- "$tmp"
       }
-
-      # Git configuration (set these in your ~/.zshrc.local or similar)
-      # export GIT_AUTHOR_EMAIL="your-email@example.com"
-      # export GIT_AUTHOR_NAME="Your Name"
-      # export GIT_COMMITTER_EMAIL="your-email@example.com"
-      # export GIT_COMMITTER_NAME="Your Name"
 
       ${lib.optionalString enableFlutter ''
         # Flutter and Android SDK paths
