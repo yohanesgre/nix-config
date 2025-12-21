@@ -30,6 +30,7 @@ DEV_PACKAGES=(
     yazi                    # Modern terminal file manager
     ffmpegthumbnailer       # Video thumbnails for yazi
     zoxide                  # Smart directory jumper for yazi
+    tmux
 )
 
 # Zsh plugins
@@ -93,6 +94,7 @@ AUR_PACKAGES=(
     dracula-icons-git
     nwg-look                # GTK theme selector and customization tool
     discord                 # Discord client (required for app.asar replacement)
+    hyprsession
 )
 
 echo ""

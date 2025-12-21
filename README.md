@@ -34,7 +34,8 @@ My personal [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-
 - **SSH**: GitHub/GitLab ready, security-focused config
 - **Zsh**: Auto-suggestions, syntax highlighting, history search
 - **Starship**: Beautiful prompt with Catppuccin Mocha theme
-- **Hyprland** (Linux): Window manager with Material Design 3 theme
+- **Hyprland** (Linux): Fully declarative Wayland window manager with Material Design 3 theme
+  - **Configuration**: All settings managed in `hyprland.nix` (250+ keybindings, window rules, animations)
   - **Waybar**: Status bar with system monitoring and power management
   - **Rofi**: Application launcher with Material Design theme
   - **SwayNC**: Notification center with custom styling
@@ -190,7 +191,7 @@ This keeps your personal git information out of version control while allowing g
 ├── flake.nix                   # Main flake configuration
 ├── flake.lock                  # Locked dependencies
 ├── home.nix                    # Home Manager configuration
-├── hyprland.nix                # Hyprland-specific configuration
+├── hyprland.nix                # Declarative Hyprland configuration (all WM settings)
 ├── config.nix                  # User configuration file
 ├── nix.conf                    # Nix daemon settings
 ├── README.md                   # This file
@@ -206,15 +207,7 @@ This keeps your personal git information out of version control while allowing g
 │   ├── setup-android-sdk.sh
 │   └── install-arch-packages.sh
 └── dotfiles/                   # Dotfiles configuration
-    ├── hypr/                   # Hyprland configuration
-    │   ├── hyprland.conf       # Main Hyprland config
-    │   ├── appearance.conf     # Material Design 3 theme
-    │   ├── keybindings.conf    # Keyboard shortcuts
-    │   ├── environment.conf    # Environment variables
-    │   ├── autostart.conf      # Autostart applications
-    │   ├── monitors.conf       # Monitor configuration
-    │   ├── input.conf          # Input devices
-    │   ├── windowrules.conf    # Window rules
+    ├── hypr/                   # Hyprland resources
     │   ├── wallpapers/         # Wallpaper images
     │   └── scripts/            # Hyprland helper scripts
     ├── waybar/                 # Waybar configuration
@@ -236,6 +229,8 @@ This keeps your personal git information out of version control while allowing g
         ├── layout
         └── style.css
 ```
+
+**Note**: All Hyprland configuration (keybindings, window rules, appearance, etc.) is now managed declaratively in `hyprland.nix` for better version control and maintainability.
 
 ## Updating & Rebuilding
 

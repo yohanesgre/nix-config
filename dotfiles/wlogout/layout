@@ -6,7 +6,7 @@
 }
 {
     "label" : "logout",
-    "action" : "~/.config/hypr/scripts/logout.sh",
+    "action" : "hyprctl dispatch exit",
     "text" : "Logout",
     "keybind" : "e"
 }
