@@ -18,6 +18,8 @@ CORE_PACKAGES=(
     zip
     xz
     usbutils  # Provides lsusb for USB device detection
+    flatpak   # System flatpak (not Nix flatpak)
+    base-devel  # Required for building AUR packages
 )
 
 # Development tools
@@ -38,21 +40,25 @@ ZSH_PACKAGES=(
 HYPRLAND_PACKAGES=(
     hyprland
     xdg-desktop-portal-hyprland
+    waybar                  # Status bar for Wayland
     swww                    # Wallpaper daemon with smooth transitions
-    wofi                    # Application launcher
+    rofi-wayland            # Application launcher (Wayland fork)
     wlogout                 # Logout menu
-    dunst                   # Notification daemon
+    swaync                  # Sway Notification Center
+    swappy                  # Screenshot annotation tool
     grim                    # Screenshot tool
     slurp                   # Screen area selection
     wl-clipboard            # Wayland clipboard utilities
     cliphist                # Clipboard history manager
     brightnessctl           # Brightness control
-    playerctl               # Media player control
     pamixer                 # PulseAudio mixer
     polkit-kde-agent        # Polkit authentication agent
     qt5-wayland             # Qt5 Wayland support
     qt6-wayland             # Qt6 Wayland support
     dolphin                 # File manager (from your config)
+    swayidle                # Idle management daemon
+    swaylock-effects        # Screen locker with effects
+    gsettings-desktop-schemas  # GSettings schemas (required for swaync)
 )
 
 # Gaming (optional)
@@ -65,6 +71,8 @@ GAMING_PACKAGES=(
 
 # Fonts
 FONT_PACKAGES=(
+    ttf-fira-code
+    ttf-font-awesome
     ttf-firacode-nerd
     ttf-jetbrains-mono-nerd
     ttf-meslo-nerd
@@ -75,6 +83,12 @@ AUR_PACKAGES=(
     visual-studio-code-bin
     ghostty                 # Terminal with GPU acceleration
     matugen                 # Color theme generator for wallpapers
+    alacritty
+    vicinae-bin
+    hyprsession             # Hyprland session management
+    dracula-gtk-theme
+    dracula-icons-git
+    nwg-look                # GTK theme selector and customization tool
 )
 
 echo ""
@@ -97,6 +111,31 @@ echo ""
 echo "📦 Installing fonts..."
 sudo pacman -S --needed --noconfirm "${FONT_PACKAGES[@]}"
 
+# Function to install yay
+install_yay() {
+    if command -v yay &> /dev/null; then
+        echo "✅ yay is already installed"
+        return 0
+    fi
+    
+    echo "📦 Installing yay (AUR helper)..."
+    
+    # Create temp directory
+    TEMP_DIR=$(mktemp -d)
+    cd "$TEMP_DIR"
+    
+    # Clone and build yay
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    makepkg -si --noconfirm
+    
+    # Cleanup
+    cd ~
+    rm -rf "$TEMP_DIR"
+    
+    echo "✅ yay installed successfully"
+}
+
 # Check if running in auto mode (from home-manager activation)
 AUTO_MODE="${AUTO_MODE:-false}"
 
@@ -115,26 +154,39 @@ else
     fi
 
     echo ""
-    echo "📦 AUR packages (requires yay or paru):"
+    echo "📦 AUR packages available:"
     echo "   - visual-studio-code-bin"
     echo "   - ghostty"
     echo "   - matugen (for wallpaper color themes)"
+    echo "   - alacritty"
+    echo "   - vicinae-bin"
+    echo "   - hyprsession"
+    echo "   - dracula themes"
     echo ""
-    read -p "Install AUR packages with yay? [y/N]: " -n 1 -r
+    read -p "Install AUR packages? [y/N]: " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Install yay first if needed
+        install_yay
+        
         if command -v yay &> /dev/null; then
+            echo "📦 Installing AUR packages..."
             yay -S --needed --noconfirm "${AUR_PACKAGES[@]}"
         elif command -v paru &> /dev/null; then
+            echo "📦 Using paru to install AUR packages..."
             paru -S --needed --noconfirm "${AUR_PACKAGES[@]}"
         else
-            echo "⚠️  yay or paru not found. Please install AUR packages manually:"
+            echo "⚠️  Could not install yay. Please install AUR packages manually:"
             for pkg in "${AUR_PACKAGES[@]}"; do
                 echo "   - $pkg"
             done
         fi
     fi
 fi
+
+echo ""
+echo "📦 Installing Flatpak applications..."
+flatpak install -y flathub io.github.zen_browser.zen
 
 echo ""
 echo "✅ Package installation complete!"

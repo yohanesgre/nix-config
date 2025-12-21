@@ -13,7 +13,7 @@
   # ============================================================================
 
   # Set to true to install Flutter, Android Studio, and Android SDK tools
-  enableFlutter = true;
+  enableFlutter = false;
 
   # Flutter SDK URL
   # Update this to the latest stable version from:
@@ -30,5 +30,14 @@
   # ============================================================================
 
   # Set to true to install Steam, Wine, and gaming-related packages
-  enableGaming = true;
+  enableGaming = false;
+
+  # ============================================================================
+  # Auto-Installation Behavior
+  # ============================================================================
+
+  # Set to true to force reinstallation of Arch packages on next activation
+  # This will ignore the marker file and run install-arch-packages.sh again
+  # Note: You need to manually set this back to false after running
+  freshInstall = false;
 }

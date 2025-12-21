@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+CONFIG_FILE="${GIT_WORK_DIR:-.}/config.nix"
+
+echo "[pre-commit] Hook started"
+echo "[pre-commit] CONFIG_FILE=$CONFIG_FILE"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "[pre-commit] Config file not found, exiting"
+    exit 0
+fi
+
+echo "[pre-commit] Found config file, applying defaults..."
+
+sed -i.bak \
+    -e 's/username = "[^"]*";/username = "example";/' \
+    -e 's/enableFlutter = [^;]*/enableFlutter = false/' \
+    -e 's/enableGaming = [^;]*/enableGaming = false/' \
+    -e 's/freshInstall = [^;]*/freshInstall = false/' \
+    "$CONFIG_FILE"
+
+echo "[pre-commit] Sed replacements done"
+
+rm -f "${CONFIG_FILE}.bak"
+
+echo "[pre-commit] Staging $CONFIG_FILE"
+git add "$CONFIG_FILE"
+
+echo "[pre-commit] Hook completed successfully"

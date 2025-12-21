@@ -1,19 +1,21 @@
 #!/bin/bash
 
 # Wallpaper cycling script
-WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+WALLPAPER_DIR="$HOME/.config/hypr/wallpapers"
 CURRENT_FILE="$HOME/.cache/current_wallpaper"
 
 # Create directory if it doesn't exist
 mkdir -p "$WALLPAPER_DIR"
 mkdir -p "$HOME/.cache"
 
-# Get list of wallpapers
-WALLPAPERS=($(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort))
+# Get list of wallpapers (follow symlinks with -L)
+WALLPAPERS=($(find -L "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort))
 
 # Check if there are any wallpapers
 if [ ${#WALLPAPERS[@]} -eq 0 ]; then
-    notify-send "Wallpaper Cycle" "No wallpapers found in $WALLPAPER_DIR"
+    if command -v notify-send &> /dev/null && pgrep -x swaync &> /dev/null; then
+        notify-send "Wallpaper Cycle" "No wallpapers found in $WALLPAPER_DIR"
+    fi
     exit 1
 fi
 
@@ -44,4 +46,6 @@ echo "$NEXT_WALLPAPER" > "$CURRENT_FILE"
 
 # Get just the filename for notification
 FILENAME=$(basename "$NEXT_WALLPAPER")
-notify-send "Wallpaper Cycle" "Now showing: $FILENAME" -t 3000
+if command -v notify-send &> /dev/null && pgrep -x swaync &> /dev/null; then
+    notify-send "Wallpaper Cycle" "Now showing: $FILENAME" -t 3000
+fi

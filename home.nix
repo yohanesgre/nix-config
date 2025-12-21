@@ -18,6 +18,7 @@ let
     else "user";
   enableFlutter = userConfig.enableFlutter or false;
   enableGaming = userConfig.enableGaming or false;
+  freshInstall = userConfig.freshInstall or false;
 in
 {
   # Import Hyprland configuration on Linux
@@ -74,31 +75,24 @@ in
     {
       # Common files for all platforms
     }
-    {
-      # SSH key setup script (all platforms)
-      ".local/bin/setup-ssh-key" = {
-        source = ./scripts/setup-ssh-key.sh;
-        executable = true;
-      };
-    }
-    (lib.mkIf isLinux {
-      # ROYUAN OLV75 Keyboard fix script (Linux only)
-      ".local/bin/fix-royuan-keyboard" = {
-        source = ./scripts/fix-royuan-keyboard.sh;
-        executable = true;
-      };
-      # Arch packages installation script (Linux only)
-      ".local/bin/install-arch-packages.sh" = {
-        source = ./scripts/install-arch-packages.sh;
-        executable = true;
-      };
-    })
+    # Automatically sync all scripts from scripts/ to .local/bin
+    (let
+      scriptsDir = ./scripts;
+      scriptFiles = builtins.readDir scriptsDir;
+      # Create home.file entries for all .sh files in scripts/
+      scriptEntries = lib.mapAttrs' (name: type:
+        if type == "regular" && lib.hasSuffix ".sh" name then
+          lib.nameValuePair ".local/bin/${lib.removeSuffix ".sh" name}" {
+            source = scriptsDir + "/${name}";
+            executable = true;
+          }
+        else
+          lib.nameValuePair "" {} # Skip non-.sh files
+      ) scriptFiles;
+      # Filter out empty entries
+      filteredEntries = lib.filterAttrs (n: v: n != "") scriptEntries;
+    in filteredEntries)
     (lib.mkIf enableFlutter {
-      # Android SDK setup script (when Flutter is enabled)
-      ".local/bin/setup-android-sdk" = {
-        source = ./scripts/setup-android-sdk.sh;
-        executable = true;
-      };
       # Create Developments directory structure
       "Developments/Sdk/.keep" = {
         text = "# This directory contains development SDKs\n";
@@ -361,12 +355,22 @@ in
     }
     (lib.mkIf isLinux {
       # Auto-run: Install Arch packages (first time only)
-      # This must run after linkGeneration to ensure scripts are in place
-      autoInstallArchPackages = lib.hm.dag.entryAfter ["linkGeneration"] ''
+      # This must run after writeBoundary to ensure scripts are symlinked
+      autoInstallArchPackages = lib.hm.dag.entryAfter ["writeBoundary"] ''
         MARKER_FILE="${config.home.homeDirectory}/.local/share/nix-home-manager/arch-packages-installed"
-        if [ ! -f "$MARKER_FILE" ]; then
-          echo "📦 First-time setup: Installing Arch packages..."
-          if AUTO_MODE=true $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/install-arch-packages.sh; then
+        FRESH_INSTALL=${if freshInstall then "true" else "false"}
+
+        # Check if script exists before attempting to run
+        if [ ! -f "${config.home.homeDirectory}/.local/bin/install-arch-packages" ]; then
+          echo "⚠️  install-arch-packages script not found, skipping..."
+        elif [ ! -f "$MARKER_FILE" ] || [ "$FRESH_INSTALL" = "true" ]; then
+          if [ "$FRESH_INSTALL" = "true" ]; then
+            echo "📦 Fresh install requested: Installing Arch packages..."
+          else
+            echo "📦 First-time setup: Installing Arch packages..."
+          fi
+
+          if AUTO_MODE=true $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/install-arch-packages; then
             mkdir -p "$(dirname "$MARKER_FILE")"
             touch "$MARKER_FILE"
             echo "✅ Arch packages installed"
@@ -382,6 +386,28 @@ in
         if [ -f "${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard" ]; then
           echo "⌨️  Applying ROYUAN keyboard fixes..."
           $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard || echo "⚠️  Keyboard fix failed"
+        fi
+      '';
+
+      # Auto-run: Setup RAPL permissions for CPU power monitoring (Linux only, first time)
+      autoSetupRaplPermissions = lib.hm.dag.entryAfter ["autoInstallArchPackages"] ''
+        RAPL_MARKER="${config.home.homeDirectory}/.local/share/nix-home-manager/rapl-configured"
+        if [ ! -f "$RAPL_MARKER" ] && [ -f "${config.home.homeDirectory}/.local/bin/setup-rapl-permissions" ]; then
+          echo "⚡ Setting up CPU power monitoring..."
+          if $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/setup-rapl-permissions; then
+            mkdir -p "$(dirname "$RAPL_MARKER")"
+            touch "$RAPL_MARKER"
+          else
+            echo "⚠️  RAPL setup failed or skipped"
+          fi
+        fi
+      '';
+
+      # Auto-run: Setup nwg-look symlinks (Linux only, every time to ensure compatibility)
+      autoSetupNwgLook = lib.hm.dag.entryAfter ["autoInstallArchPackages"] ''
+        if [ -f "${config.home.homeDirectory}/.local/bin/setup-nwg-look" ]; then
+          echo "🎨 Setting up nwg-look compatibility..."
+          $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/setup-nwg-look || echo "⚠️  nwg-look setup failed"
         fi
       '';
     })

@@ -1,0 +1,99 @@
+/* Material Design 3 - Rofi Configuration */
+
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    display-drun: "Applications";
+    display-run: "Run";
+    display-window: "Windows";
+    drun-display-format: "{name}";
+    font: "JetBrainsMono Nerd Font 12";
+    icon-theme: "Papirus-Dark";
+}
+
+@theme "/dev/null"
+
+* {
+    bg: #1C1B1F;
+    bg-alt: #2B2930;
+    fg: #E6E1E5;
+    fg-alt: #CAC4D0;
+
+    primary: #6750A4;
+    primary-light: #D0BCFF;
+
+    surface: #313034;
+    surface-variant: #49454F;
+
+    background-color: transparent;
+    text-color: @fg;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    background-color: @bg;
+    border: 1px solid;
+    border-color: @primary;
+    border-radius: 12px;
+    width: 600px;
+    padding: 8px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing: 8px;
+}
+
+inputbar {
+    children: [ prompt, entry ];
+    background-color: @bg-alt;
+    border-radius: 8px;
+    padding: 12px;
+    spacing: 8px;
+}
+
+prompt {
+    background-color: transparent;
+    text-color: @primary-light;
+}
+
+entry {
+    background-color: transparent;
+    text-color: @fg;
+    placeholder: "Search...";
+    placeholder-color: @fg-alt;
+}
+
+listview {
+    background-color: transparent;
+    columns: 1;
+    lines: 8;
+    spacing: 4px;
+    padding: 4px;
+    scrollbar: false;
+}
+
+element {
+    background-color: transparent;
+    text-color: @fg;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+element selected {
+    background-color: @primary;
+    text-color: #FFFFFF;
+}
+
+element-icon {
+    size: 32px;
+    margin: 0 8px 0 0;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+}

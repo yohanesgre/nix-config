@@ -1,0 +1,294 @@
+/* Material Design 3 - Islands Style (GTK CSS) */
+
+* {
+	border: none;
+	font-family: "JetBrainsMono Nerd Font", "Roboto", sans-serif;
+	font-size: 12px;
+	min-height: 0;
+}
+
+window#waybar {
+	background-color: transparent;
+	color: #e6e1e5;
+}
+
+/* Module containers - GTK box selectors */
+.modules-left,
+.modules-center,
+.modules-right {
+	background: transparent;
+}
+
+/* Material Islands - Using proper box selectors for groups */
+box#workspaces-window,
+box#clock,
+box#actions,
+box#system,
+box#media,
+box#connectivity {
+	background: rgba(28, 27, 31, 0.95);
+	border-radius: 12px;
+	margin: 0 3px;
+	padding: 2px 6px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4),
+	            0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Specific group island styling with Material colors */
+box#workspaces-window {
+	background: rgba(28, 27, 31, 0.95);
+	padding: 2px;
+}
+
+box#clock {
+	background: rgba(28, 27, 31, 0.95);
+	padding: 4px 12px;
+}
+
+box#actions {
+	background: rgba(28, 27, 31, 0.95);
+}
+
+box#system {
+	background: rgba(28, 27, 31, 0.95);
+}
+
+box#media {
+	background: rgba(28, 27, 31, 0.95);
+}
+
+box#connectivity {
+	background: rgba(28, 27, 31, 0.95);
+}
+
+/* Workspaces - GTK box selector */
+#workspaces {
+	background: transparent;
+	padding: 0;
+	margin: 0;
+}
+
+#workspaces button {
+	padding: 4px 10px;
+	margin: 2px 3px;
+	background: transparent;
+	color: #e6e1e5;
+	border-radius: 10px;
+	min-width: 20px;
+}
+
+#workspaces button.active {
+	background: #d0bcff;
+	color: #381e72;
+	font-weight: bold;
+	box-shadow: 0 2px 4px rgba(208, 188, 255, 0.3);
+}
+
+#workspaces button:hover {
+	background: rgba(208, 188, 255, 0.16);
+	color: #e6e1e5;
+}
+
+/* Window title - label selector */
+label#window {
+	padding: 4px 12px;
+	margin: 0 0 0 6px;
+	color: #e6e1e5;
+	font-weight: 500;
+}
+
+/* Clock - label selector */
+label#clock {
+	padding: 0 10px;
+	margin: 0;
+	color: #e6e1e5;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+/* Module labels inside groups */
+label#idle_inhibitor,
+label#custom-notification,
+label#custom-power-menu,
+label#custom-power-profile,
+label#custom-power,
+label#cpu,
+label#memory,
+label#disk,
+label#temperature,
+label#pulseaudio,
+label#network {
+	padding: 4px 8px;
+	margin: 0;
+	background: transparent;
+}
+
+/* Tray uses box, not label */
+box#tray {
+	padding: 4px 8px;
+	margin: 0;
+	background: transparent;
+}
+
+/* First and last children in group boxes */
+box#workspaces-window > box > *:first-child {
+	padding-left: 8px;
+}
+
+box#workspaces-window > box > *:last-child {
+	padding-right: 8px;
+}
+
+box#actions > box > *:first-child,
+box#system > box > *:first-child,
+box#media > box > *:first-child,
+box#connectivity > box > *:first-child {
+	border-radius: 12px 0 0 12px;
+	padding-left: 12px;
+}
+
+box#actions > box > *:last-child,
+box#system > box > *:last-child,
+box#media > box > *:last-child,
+box#connectivity > box > *:last-child {
+	border-radius: 0 12px 12px 0;
+	padding-right: 12px;
+}
+
+/* Single item groups fully rounded */
+box#actions > box > *:only-child,
+box#system > box > *:only-child,
+box#media > box > *:only-child,
+box#connectivity > box > *:only-child {
+	border-radius: 12px;
+	padding-left: 12px;
+	padding-right: 12px;
+}
+
+/* Hover states - Material state layers */
+label#idle_inhibitor:hover,
+label#custom-notification:hover,
+label#custom-power-menu:hover,
+label#pulseaudio:hover,
+label#network:hover {
+	background: rgba(208, 188, 255, 0.08);
+}
+
+box#tray:hover {
+	background: rgba(208, 188, 255, 0.08);
+}
+
+/* Module-specific colors */
+label#idle_inhibitor {
+	color: #e6e1e5;
+}
+
+label#idle_inhibitor.activated {
+	color: #e4c068;
+	font-weight: bold;
+}
+
+label#custom-notification {
+	color: #d0bcff;
+	font-size: 15px;
+}
+
+label#custom-power-menu {
+	color: #f2b8b5;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+label#custom-power-menu:hover {
+	color: #ffffff;
+	background: rgba(242, 184, 181, 0.16);
+}
+
+label#custom-power-profile {
+	color: #a8c7fa;
+	font-weight: 600;
+}
+
+label#custom-power-profile.performance {
+	color: #f2b8b5;
+}
+
+label#custom-power-profile.balanced {
+	color: #a8c7fa;
+}
+
+label#custom-power-profile.power-saver {
+	color: #a8dab5;
+}
+
+label#custom-power {
+	color: #e4c068;
+	font-weight: 600;
+}
+
+label#cpu {
+	color: #a8c7fa;
+}
+
+label#memory {
+	color: #efb8c8;
+}
+
+label#disk {
+	color: #dcc7ff;
+}
+
+label#temperature {
+	color: #a8dab5;
+}
+
+label#temperature.critical {
+	color: #f2b8b5;
+	background: rgba(242, 184, 181, 0.2);
+	font-weight: bold;
+}
+
+label#pulseaudio {
+	color: #d0bcff;
+}
+
+label#pulseaudio.muted {
+	color: #f2b8b5;
+}
+
+label#network {
+	color: #a8dab5;
+}
+
+label#network.disconnected {
+	color: #f2b8b5;
+	background: rgba(242, 184, 181, 0.16);
+}
+
+box#tray {
+	color: #e6e1e5;
+}
+
+box#tray.empty {
+	padding: 0;
+	margin: 0;
+	min-width: 0;
+}
+
+/* Tray item states */
+box#tray > widget > * {
+	padding: 0 4px;
+}
+
+/* Tooltip styling */
+tooltip {
+	background: rgba(28, 27, 31, 0.98);
+	border: 1px solid rgba(208, 188, 255, 0.2);
+	border-radius: 8px;
+	padding: 8px 12px;
+	color: #e6e1e5;
+}
+
+tooltip label {
+	color: #e6e1e5;
+}

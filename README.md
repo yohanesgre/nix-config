@@ -25,6 +25,7 @@ My personal [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-
 - **Terminal**: ghostty
 - **System tools**: btop, fastfetch, nix-index
 - **Fonts**: Nerd Fonts (FiraCode, JetBrains Mono, Meslo LG)
+- **Wayland/Hyprland (Linux)**: hyprland, waybar, rofi-wayland, swaync, swww, grim, slurp, swappy
 - **Linux-only**: flatpak
 - **Gaming (optional)**: steam, wine, protontricks (Linux only)
 
@@ -33,17 +34,33 @@ My personal [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-
 - **SSH**: GitHub/GitLab ready, security-focused config
 - **Zsh**: Auto-suggestions, syntax highlighting, history search
 - **Starship**: Beautiful prompt with Catppuccin Mocha theme
+- **Hyprland** (Linux): Window manager with Material Design 3 theme
+  - **Waybar**: Status bar with system monitoring and power management
+  - **Rofi**: Application launcher with Material Design theme
+  - **SwayNC**: Notification center with custom styling
+  - **Screenshots**: Grim + Slurp + Swappy for annotated screenshots
+  - **Wallpapers**: SWWW for smooth wallpaper transitions with cycling/picker scripts
 
 ### Scripts
 - `setup-ssh-key`: Interactive SSH key setup for GitHub
 - `fix-royuan-keyboard` (Linux): Fix for ROYUAN OLV75 keyboard
+- `setup-rapl-permissions` (Linux): Setup CPU power monitoring permissions
+- `install-arch-packages` (Linux): Install system packages via pacman
 - `setup-android-sdk` (Optional): Android SDK setup for Flutter development
+
+### Hyprland Scripts
+- `wallpaper.sh`: Set wallpaper with SWWW (supports random selection)
+- `wallpaper-cycle.sh`: Cycle through wallpapers (Super + Alt + W)
+- `wallpaper-picker.sh`: Pick wallpaper via Rofi (Super + Shift + W)
+- `display-picker.sh`: Switch display resolution (Super + Shift + D)
+- `power-monitor.sh`: Waybar power monitoring (CPU, battery)
+- `power-profile.sh`: Waybar power profile switcher
 
 ## Installation
 
 ### Prerequisites
 
-Install Nix with flakes support:
+#### 1. Install Nix with flakes support
 
 ```bash
 # On Linux or macOS
@@ -53,6 +70,19 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 mkdir -p ~/.config/nix
 echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 ```
+
+#### 2. Install Home Manager (Standalone)
+
+```bash
+# Add the Home Manager channel (matching your Nix version)
+nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+nix-channel --update
+
+# Install Home Manager
+nix-shell '<home-manager>' -A install
+```
+
+**Note**: For flake-based configuration (recommended), Home Manager will be installed automatically from the flake.
 
 ### Setup
 
@@ -160,6 +190,7 @@ This keeps your personal git information out of version control while allowing g
 ├── flake.nix                   # Main flake configuration
 ├── flake.lock                  # Locked dependencies
 ├── home.nix                    # Home Manager configuration
+├── hyprland.nix                # Hyprland-specific configuration
 ├── config.nix                  # User configuration file
 ├── nix.conf                    # Nix daemon settings
 ├── README.md                   # This file
@@ -168,22 +199,136 @@ This keeps your personal git information out of version control while allowing g
 │   ├── GUIDE.md                # User guide
 │   ├── REFERENCE.md            # Technical reference
 │   └── ADVANCED.md             # Advanced topics
-└── scripts/                    # Helper scripts
-    ├── setup-ssh-key.sh
-    ├── fix-royuan-keyboard.sh
-    ├── setup-android-sdk.sh
-    └── install-arch-packages.sh
+├── scripts/                    # Helper scripts
+│   ├── setup-ssh-key.sh
+│   ├── fix-royuan-keyboard.sh
+│   ├── setup-rapl-permissions.sh
+│   ├── setup-android-sdk.sh
+│   └── install-arch-packages.sh
+└── dotfiles/                   # Dotfiles configuration
+    ├── hypr/                   # Hyprland configuration
+    │   ├── hyprland.conf       # Main Hyprland config
+    │   ├── appearance.conf     # Material Design 3 theme
+    │   ├── keybindings.conf    # Keyboard shortcuts
+    │   ├── environment.conf    # Environment variables
+    │   ├── autostart.conf      # Autostart applications
+    │   ├── monitors.conf       # Monitor configuration
+    │   ├── input.conf          # Input devices
+    │   ├── windowrules.conf    # Window rules
+    │   ├── wallpapers/         # Wallpaper images
+    │   └── scripts/            # Hyprland helper scripts
+    ├── waybar/                 # Waybar configuration
+    │   ├── config.jsonc        # Waybar modules
+    │   ├── style.css           # Waybar styling
+    │   └── scripts/            # Waybar scripts
+    ├── rofi/                   # Rofi launcher
+    │   └── config.rasi         # Material Design theme
+    ├── swaync/                 # Notification center
+    │   ├── config.json         # SwayNC settings
+    │   └── style.css           # SwayNC styling
+    ├── swaylock/               # Screen locker
+    │   └── config
+    ├── swayidle/               # Idle manager
+    │   └── config
+    ├── swappy/                 # Screenshot editor
+    │   └── config
+    └── wlogout/                # Logout menu
+        ├── layout
+        └── style.css
 ```
 
-## Updating
+## Updating & Rebuilding
+
+### Update Flake Inputs (nixpkgs, home-manager, etc.)
 
 ```bash
-# Update flake inputs
+# Update all flake inputs to latest versions
 nix flake update ~/.config/nix
 
-# Apply updates
-home-manager switch --flake ~/.config/nix#default
+# Update specific input only
+nix flake lock --update-input nixpkgs ~/.config/nix
+nix flake lock --update-input home-manager ~/.config/nix
 ```
+
+### Rebuild After Configuration Changes
+
+```bash
+# After editing home.nix, config.nix, or any configuration files
+# Linux (x86_64)
+home-manager switch --flake ~/.config/nix#archlinux
+
+# Linux (ARM64)
+home-manager switch --flake ~/.config/nix#archlinux-arm
+
+# macOS (Apple Silicon)
+home-manager switch --flake ~/.config/nix#macos
+
+# macOS (Intel)
+home-manager switch --flake ~/.config/nix#macos-intel
+
+# Or use the alias (configured for your platform)
+hm
+```
+
+### Refresh/Rebuild Without Changes
+
+```bash
+# Force rebuild even if nothing changed
+home-manager switch --flake ~/.config/nix#archlinux --refresh
+
+# Or clear the build cache and rebuild
+nix-collect-garbage
+home-manager switch --flake ~/.config/nix#archlinux
+```
+
+## Hyprland Keybindings (Linux)
+
+### Applications
+- `Super + Return` - Launch terminal (Ghostty)
+- `Super + D` - Application launcher (Rofi)
+- `Super + E` - File manager (Dolphin)
+- `Super + B` - Browser (Zen)
+- `Super + W` - Close active window
+- `Super + V` - Toggle floating
+- `Super + F` - Toggle fullscreen
+- `Super + Space` - Vicinae toggle
+
+### Window Management
+- `Super + Arrow Keys` - Move focus
+- `Super + Shift + Arrow Keys` - Move window
+- `Super + Ctrl + Arrow Keys` - Resize window
+- `Super + J` - Toggle split
+- `Super + P` - Pseudo-tiling
+- `Super + Mouse Left/Right` - Move/Resize window
+
+### Workspaces
+- `Super + 1-9` - Switch to workspace
+- `Super + Shift + 1-9` - Move window to workspace
+- `Super + S` - Toggle scratchpad
+- `Super + Shift + S` - Move to scratchpad
+- `Super + Mouse Scroll` - Cycle workspaces
+
+### Screenshots
+- `Print` - Full screen → Swappy (annotate)
+- `Super + Print` - Area selection → Swappy (annotate)
+- `Super + Shift + Print` - Area selection → Clipboard
+
+### Wallpapers
+- `Super + Shift + W` - Pick wallpaper (Rofi)
+- `Super + Alt + W` - Cycle wallpaper
+
+### System
+- `Super + N` - Toggle notification center
+- `Super + Shift + D` - Display resolution picker
+- `Super + Shift + R` - Reload Hyprland + Waybar
+- `Super + Shift + L` - Lock screen
+- `Super + Escape` - Logout menu (wlogout)
+- `Super + Shift + Escape` - Quick logout
+
+### Media Keys
+- Volume up/down/mute
+- Brightness up/down
+- Media play/pause/next/previous
 
 ## Platform-Specific Notes
 

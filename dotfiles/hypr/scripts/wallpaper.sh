@@ -4,11 +4,25 @@
 # Uses swww for wallpaper and matugen for theming
 
 WALLPAPER_PATH="$1"
-WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+WALLPAPER_DIR="$HOME/.config/hypr/wallpapers"
 
-# If no argument provided, use the default wallpaper
+# If no argument provided, randomly select from wallpapers directory
 if [ -z "$WALLPAPER_PATH" ]; then
-    WALLPAPER_PATH="$HOME/Downloads/pexels-simon73-1183099.jpg"
+    # Get array of wallpapers (follow symlinks with -L)
+    WALLPAPERS=($(find -L "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null))
+
+    # Check if wallpapers exist
+    if [ ${#WALLPAPERS[@]} -eq 0 ]; then
+        echo "No wallpapers found in $WALLPAPER_DIR"
+        if command -v notify-send &> /dev/null && pgrep -x swaync &> /dev/null; then
+            notify-send "Wallpaper" "No wallpapers found in wallpapers directory" -t 3000
+        fi
+        exit 1
+    fi
+
+    # Select random wallpaper
+    RANDOM_INDEX=$(( RANDOM % ${#WALLPAPERS[@]} ))
+    WALLPAPER_PATH="${WALLPAPERS[$RANDOM_INDEX]}"
 fi
 
 # Check if swww daemon is running
@@ -26,14 +40,16 @@ swww img "$WALLPAPER_PATH" \
     --transition-fps 60 \
     --transition-angle 30
 
-# Generate theme colors with matugen
-if [ -f "$WALLPAPER_PATH" ]; then
+# Generate theme colors with matugen (if configured)
+if [ -f "$WALLPAPER_PATH" ] && [ -f "$HOME/.config/matugen/generate-theme.sh" ]; then
     echo "Generating color scheme..."
     ~/.config/matugen/generate-theme.sh "$WALLPAPER_PATH"
 fi
 
 echo "Wallpaper and theme applied successfully!"
 
-# Send notification
+# Send notification (if notification daemon is running)
 FILENAME=$(basename "$WALLPAPER_PATH")
-notify-send "Wallpaper" "Applied: $FILENAME" -t 2000
+if command -v notify-send &> /dev/null && pgrep -x swaync &> /dev/null; then
+    notify-send "Wallpaper" "Applied: $FILENAME" -t 2000
+fi

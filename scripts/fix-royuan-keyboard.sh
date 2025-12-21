@@ -27,7 +27,9 @@ DESIRED_FNMODE=2
 
 # Configuration files
 MODPROBE_CONF="/etc/modprobe.d/hid_apple.conf"
-UDEV_RULE="/etc/udev/rules.d/99-royuan-keyboard.rules"
+SYSTEMD_SERVICE="/etc/systemd/system/royuan-keyboard-fix.service"
+BACKUP_DIR="/etc/royuan-keyboard-backup"
+BACKUP_TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 print_header() {
     echo -e "${BLUE}========================================${NC}"
@@ -116,11 +118,17 @@ check_persistent_config() {
 
     local all_good=true
 
-    # Check udev rule
-    if [ -f "$UDEV_RULE" ]; then
-        echo -e "${GREEN}✓ Udev rule exists: ${UDEV_RULE}${NC}"
+    # Check systemd service
+    if [ -f "$SYSTEMD_SERVICE" ]; then
+        echo -e "${GREEN}✓ Systemd service exists: ${SYSTEMD_SERVICE}${NC}"
+        if systemctl is-enabled royuan-keyboard-fix.service &>/dev/null; then
+            echo -e "${GREEN}  Service is enabled${NC}"
+        else
+            echo -e "${YELLOW}  Service exists but is not enabled${NC}"
+            all_good=false
+        fi
     else
-        echo -e "${RED}✗ Udev rule missing: ${UDEV_RULE}${NC}"
+        echo -e "${RED}✗ Systemd service missing: ${SYSTEMD_SERVICE}${NC}"
         all_good=false
     fi
 
@@ -132,6 +140,14 @@ check_persistent_config() {
         all_good=false
     fi
 
+    # Check for backups
+    if [ -d "$BACKUP_DIR" ]; then
+        local backup_count=$(find "$BACKUP_DIR" -type f 2>/dev/null | wc -l)
+        if [ "$backup_count" -gt 0 ]; then
+            echo -e "${BLUE}ℹ Backups found: $backup_count file(s) in ${BACKUP_DIR}${NC}"
+        fi
+    fi
+
     if [ "$all_good" = true ]; then
         return 0
     else
@@ -139,41 +155,55 @@ check_persistent_config() {
     fi
 }
 
+backup_file() {
+    local file_path="$1"
+
+    if [ ! -f "$file_path" ]; then
+        return 0
+    fi
+
+    # Create backup directory if it doesn't exist
+    sudo mkdir -p "$BACKUP_DIR"
+
+    local filename=$(basename "$file_path")
+    local backup_path="${BACKUP_DIR}/${filename}.${BACKUP_TIMESTAMP}.bak"
+
+    echo "  Backing up existing file: $file_path"
+    sudo cp "$file_path" "$backup_path"
+
+    if [ -f "$backup_path" ]; then
+        echo -e "${GREEN}  ✓ Backup created: $backup_path${NC}"
+        return 0
+    else
+        echo -e "${RED}  ✗ Failed to create backup${NC}"
+        return 1
+    fi
+}
+
 install_persistent_config() {
     echo ""
     echo -e "${YELLOW}Installing persistent configuration...${NC}"
+    echo ""
 
-    # Create udev rule
-    echo "  Creating udev rule..."
-    sudo tee "$UDEV_RULE" > /dev/null << 'EOF'
-# ROYUAN OLV75 Keyboard - Set fnmode to 2 for F1-F12 as default
-# This rule applies only to the ROYUAN OLV75 (USB ID: 05ac:024f)
-ACTION=="add", SUBSYSTEM=="hid", ATTRS{idVendor}=="05ac", ATTRS{idProduct}=="024f", RUN+="/bin/sh -c 'echo 2 > /sys/module/hid_apple/parameters/fnmode'"
-EOF
-
-    if [ -f "$UDEV_RULE" ]; then
-        echo -e "${GREEN}✓ Udev rule created${NC}"
-    else
-        echo -e "${RED}✗ Failed to create udev rule${NC}"
-        return 1
-    fi
+    # Backup existing files
+    echo -e "${BLUE}Backing up existing configurations...${NC}"
+    backup_file "$MODPROBE_CONF" || true
+    backup_file "$SYSTEMD_SERVICE" || true
 
     # Create modprobe config
+    echo ""
     echo "  Creating modprobe config..."
     sudo tee "$MODPROBE_CONF" > /dev/null << 'EOF'
-# Configuration for Apple keyboards
+# Configuration for Apple keyboards (ROYUAN OLV75)
+# Managed by fix-royuan-keyboard script
 #
-# IMPORTANT: Device-specific settings are handled by udev rules
-# See /etc/udev/rules.d/99-royuan-keyboard.rules for ROYUAN OLV75 configuration
-#
-# This is the default fnmode for other Apple keyboards:
 # fnmode options:
 #   0 = disabled (no special function key behavior)
 #   1 = media keys by default (Fn key switches to F1-F12)
 #   2 = F1-F12 by default (Fn key switches to media keys)
 #
-# Default setting for other Apple keyboards (change if needed)
-options hid_apple fnmode=1
+# Setting fnmode=2 for ROYUAN OLV75 keyboard
+options hid_apple fnmode=2
 EOF
 
     if [ -f "$MODPROBE_CONF" ]; then
@@ -183,10 +213,35 @@ EOF
         return 1
     fi
 
-    # Reload udev rules
-    echo "  Reloading udev rules..."
-    sudo udevadm control --reload-rules 2>/dev/null
-    echo -e "${GREEN}✓ Udev rules reloaded${NC}"
+    # Create systemd service (fallback method)
+    echo "  Creating systemd service..."
+    sudo tee "$SYSTEMD_SERVICE" > /dev/null << 'EOF'
+[Unit]
+Description=Fix ROYUAN OLV75 Keyboard fnmode
+After=systemd-modules-load.service
+Documentation=https://github.com/yourusername/nix-config
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo 2 > /sys/module/hid_apple/parameters/fnmode'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    if [ -f "$SYSTEMD_SERVICE" ]; then
+        echo -e "${GREEN}✓ Systemd service created${NC}"
+    else
+        echo -e "${RED}✗ Failed to create systemd service${NC}"
+        return 1
+    fi
+
+    # Enable systemd service
+    echo "  Enabling systemd service..."
+    sudo systemctl daemon-reload
+    sudo systemctl enable royuan-keyboard-fix.service 2>/dev/null
+    echo -e "${GREEN}✓ Systemd service enabled${NC}"
 
     # Regenerate initramfs
     echo "  Regenerating initramfs (this may take a moment)..."
@@ -195,7 +250,102 @@ EOF
 
     echo ""
     echo -e "${GREEN}✓ Persistent configuration installed successfully!${NC}"
-    echo -e "  The fix will persist across reboots."
+    echo -e "  ${BLUE}Installation summary:${NC}"
+    echo -e "    • Modprobe config: Sets fnmode=2 at module load"
+    echo -e "    • Systemd service: Ensures fnmode=2 after boot (fallback)"
+    echo -e "    • Backups saved to: ${BACKUP_DIR}"
+    echo ""
+    echo -e "  ${YELLOW}Note: Reboot for changes to take full effect${NC}"
+    echo -e "  Or run: ${BLUE}fix-royuan-keyboard --apply${NC} for immediate fix"
+
+    return 0
+}
+
+revert_config() {
+    echo ""
+    echo -e "${YELLOW}Reverting configuration...${NC}"
+    echo ""
+
+    local reverted=false
+
+    # Check if backup directory exists
+    if [ ! -d "$BACKUP_DIR" ]; then
+        echo -e "${YELLOW}No backup directory found at ${BACKUP_DIR}${NC}"
+        echo -e "${YELLOW}Will only remove installed configurations${NC}"
+    else
+        echo -e "${BLUE}Found backups in ${BACKUP_DIR}${NC}"
+        echo ""
+
+        # Restore modprobe config
+        local modprobe_backup=$(find "$BACKUP_DIR" -name "hid_apple.conf.*.bak" -type f 2>/dev/null | sort -r | head -1)
+        if [ -n "$modprobe_backup" ]; then
+            echo "  Restoring modprobe config from backup..."
+            sudo cp "$modprobe_backup" "$MODPROBE_CONF"
+            echo -e "${GREEN}  ✓ Restored: $MODPROBE_CONF${NC}"
+            reverted=true
+        elif [ -f "$MODPROBE_CONF" ]; then
+            echo "  No backup found for modprobe config, removing current file..."
+            sudo rm -f "$MODPROBE_CONF"
+            echo -e "${GREEN}  ✓ Removed: $MODPROBE_CONF${NC}"
+            reverted=true
+        fi
+
+        # Handle systemd service (no need to restore, just remove)
+        if [ -f "$SYSTEMD_SERVICE" ]; then
+            echo "  Disabling and removing systemd service..."
+            sudo systemctl disable royuan-keyboard-fix.service 2>/dev/null || true
+            sudo rm -f "$SYSTEMD_SERVICE"
+            sudo systemctl daemon-reload
+            echo -e "${GREEN}  ✓ Removed: $SYSTEMD_SERVICE${NC}"
+            reverted=true
+        fi
+    fi
+
+    if [ "$reverted" = false ]; then
+        echo -e "${YELLOW}No configurations to revert${NC}"
+        return 0
+    fi
+
+    # Regenerate initramfs
+    echo ""
+    echo "  Regenerating initramfs..."
+    sudo mkinitcpio -P > /dev/null 2>&1
+    echo -e "${GREEN}✓ Initramfs regenerated${NC}"
+
+    echo ""
+    echo -e "${GREEN}✓ Configuration reverted successfully!${NC}"
+    echo -e "  ${BLUE}What was done:${NC}"
+    echo -e "    • Restored backed-up configurations (if available)"
+    echo -e "    • Removed ROYUAN keyboard fix configurations"
+    echo -e "    • Disabled systemd service"
+    echo ""
+    echo -e "  ${YELLOW}Note: Reboot for changes to take full effect${NC}"
+    echo -e "  Backups are preserved in: ${BACKUP_DIR}"
+
+    return 0
+}
+
+list_backups() {
+    echo ""
+    echo -e "${BLUE}Backup Information${NC}"
+    echo -e "${BLUE}==================${NC}"
+    echo ""
+
+    if [ ! -d "$BACKUP_DIR" ]; then
+        echo -e "${YELLOW}No backup directory found${NC}"
+        return 0
+    fi
+
+    local backup_files=$(find "$BACKUP_DIR" -type f 2>/dev/null)
+    if [ -z "$backup_files" ]; then
+        echo -e "${YELLOW}Backup directory is empty${NC}"
+        return 0
+    fi
+
+    echo -e "Backup location: ${BACKUP_DIR}"
+    echo ""
+    echo "Available backups:"
+    find "$BACKUP_DIR" -type f -exec ls -lh {} \; | awk '{print "  " $9 " (" $5 ", " $6 " " $7 " " $8 ")"}'
 
     return 0
 }
@@ -207,17 +357,28 @@ Usage: fix-royuan-keyboard [OPTION]
 Fix function key issues for ROYUAN OLV75 keyboard on Linux.
 
 OPTIONS:
-    --check     Check keyboard status and current configuration
-    --apply     Apply the fnmode fix immediately (temporary until reboot)
-    --install   Install persistent configuration files
-    --help      Show this help message
+    --check         Check keyboard status and current configuration
+    --apply         Apply the fnmode fix immediately (temporary until reboot)
+    --install       Install persistent configuration with backup
+    --revert        Restore from backup and remove configurations
+    --list-backups  Show all available backups
+    --help          Show this help message
 
 If no option is specified, runs --check and --apply.
 
 EXAMPLES:
-    fix-royuan-keyboard              # Quick fix (check and apply)
-    fix-royuan-keyboard --check      # Only check status
-    fix-royuan-keyboard --install    # Install persistent config
+    fix-royuan-keyboard                # Quick fix (check and apply)
+    fix-royuan-keyboard --check        # Only check status
+    fix-royuan-keyboard --install      # Install persistent config with backup
+    fix-royuan-keyboard --revert       # Restore previous configuration
+    fix-royuan-keyboard --list-backups # Show backup files
+
+CONFIGURATION:
+    This script uses a dual-method approach for reliability:
+    1. Modprobe config - Sets fnmode=2 when hid_apple module loads
+    2. Systemd service - Ensures fnmode=2 after boot (fallback)
+
+    All changes are backed up before installation.
 
 EOF
 }
@@ -241,6 +402,12 @@ main() {
             ;;
         --install)
             install_persistent_config
+            ;;
+        --revert)
+            revert_config
+            ;;
+        --list-backups)
+            list_backups
             ;;
         "")
             # Default: check and apply

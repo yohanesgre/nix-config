@@ -7,10 +7,9 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-flatpak.url = "github:gmodena/nix-flatpak";
   };
 
-  outputs = { nixpkgs, home-manager, nix-flatpak, ... }:
+  outputs = { nixpkgs, home-manager, ... }:
     let
       # Helper function to create home configuration for a system
       mkHomeConfiguration = system: pkgs: home-manager.lib.homeManagerConfiguration {
@@ -18,9 +17,7 @@
 
         modules = [
           ./home.nix
-        ] ++ (if pkgs.stdenv.isLinux then [
-          nix-flatpak.homeManagerModules.nix-flatpak
-        ] else []);
+        ];
       };
 
       # Define systems
