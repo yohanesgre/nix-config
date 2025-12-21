@@ -172,17 +172,13 @@ See [docs/ADVANCED.md](docs/ADVANCED.md) for Flutter-specific setup instructions
 
 ### Git Configuration
 
-Git user information is configured via environment variables in your shell:
+Git user information is configured via `config.nix`:
 
-```bash
-# Add to ~/.zshrc or ~/.zshrc.local
-export GIT_AUTHOR_EMAIL="your-email@example.com"
-export GIT_AUTHOR_NAME="Your Name"
-export GIT_COMMITTER_EMAIL="your-email@example.com"
-export GIT_COMMITTER_NAME="Your Name"
+```nix
+  # Git Configuration
+  gitUserName = "";
+  gitUserEmail = "";
 ```
-
-This keeps your personal git information out of version control while allowing git to use these values automatically.
 
 ## File Structure
 
