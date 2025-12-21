@@ -18,6 +18,7 @@ let
     else "user";
   enableFlutter = userConfig.enableFlutter or false;
   enableGaming = userConfig.enableGaming or false;
+  enableRoyuanKeyboard = userConfig.enableRoyuanKeyboard or false;
   freshInstall = userConfig.freshInstall or false;
 in
 {
@@ -380,14 +381,14 @@ in
         fi
       '';
 
-      # Auto-run: Fix ROYUAN keyboard (Linux only, every time)
+      # Auto-run: Fix ROYUAN keyboard (Linux only, if enabled)
       # This must run after autoInstallArchPackages to ensure usbutils is installed
-      autoFixKeyboard = lib.hm.dag.entryAfter ["autoInstallArchPackages"] ''
+      autoFixKeyboard = lib.mkIf enableRoyuanKeyboard (lib.hm.dag.entryAfter ["autoInstallArchPackages"] ''
         if [ -f "${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard" ]; then
           echo "⌨️  Applying ROYUAN keyboard fixes..."
           $DRY_RUN_CMD ${config.home.homeDirectory}/.local/bin/fix-royuan-keyboard || echo "⚠️  Keyboard fix failed"
         fi
-      '';
+      '');
 
       # Auto-run: Setup RAPL permissions for CPU power monitoring (Linux only, first time)
       autoSetupRaplPermissions = lib.hm.dag.entryAfter ["autoInstallArchPackages"] ''

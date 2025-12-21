@@ -33,6 +33,14 @@
   enableGaming = false;
 
   # ============================================================================
+  # Hardware-Specific Features (Linux only)
+  # ============================================================================
+
+  # Set to true to enable ROYUAN OLV75 keyboard fnmode fix
+  # This fixes function key behavior for ROYUAN keyboards
+  enableRoyuanKeyboard = false;
+
+  # ============================================================================
   # Auto-Installation Behavior
   # ============================================================================
 
