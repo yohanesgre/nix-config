@@ -42,6 +42,16 @@ lib.mkIf isLinux {
       executable = true;
     };
 
+    # GTK theme isolation scripts
+    ".config/hyprland-scripts/gtk-config-load.sh" = {
+      source = ./dotfiles/hyprland-scripts/gtk-config-load.sh;
+      executable = true;
+    };
+    ".config/hyprland-scripts/gtk-config-save.sh" = {
+      source = ./dotfiles/hyprland-scripts/gtk-config-save.sh;
+      executable = true;
+    };
+
     # Wlogout configuration
     ".config/wlogout/layout".source = ./dotfiles/wlogout/layout;
     ".config/wlogout/style.css".source = ./dotfiles/wlogout/style.css;

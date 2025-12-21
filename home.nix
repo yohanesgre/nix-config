@@ -118,8 +118,7 @@ in
     # TERMINAL not set - using system ghostty
     # Arch Linux integration (from Arch Wiki)
     LOCALE_ARCHIVE = "/usr/lib/locale/locale-archive";
-    # Desktop integration on Linux (from Arch Wiki)
-    XDG_DATA_DIRS = "${config.home.homeDirectory}/.nix-profile/share:$XDG_DATA_DIRS";
+    # Note: XDG_DATA_DIRS is set in zsh initExtra to override system scripts
   } // lib.optionalAttrs enableFlutter {
     # Flutter/Android development environment variables
     JAVA_HOME = "${pkgs.jdk17}";
@@ -299,6 +298,13 @@ in
 
       # Display red dots whilst waiting for completion
       COMPLETION_WAITING_DOTS="true"
+
+      ${lib.optionalString isLinux ''
+        # Fix XDG_DATA_DIRS ordering for Linux
+        # System paths must come first so Plasma and other system packages work correctly
+        # This runs AFTER all profile.d scripts (Flatpak, Nix daemon, etc)
+        export XDG_DATA_DIRS="/usr/local/share:/usr/share:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share"
+      ''}
 
       # Load zsh-history-substring-search
       ${lib.optionalString isDarwin ''
