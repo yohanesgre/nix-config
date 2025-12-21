@@ -42,7 +42,6 @@ ZSH_PACKAGES=(
 # Hyprland and Wayland ecosystem
 HYPRLAND_PACKAGES=(
     hyprland
-    xdg-desktop-portal-hyprland
     waybar                  # Status bar for Wayland
     swww                    # Wallpaper daemon with smooth transitions
     rofi-wayland            # Application launcher (Wayland fork)
@@ -90,7 +89,6 @@ AUR_PACKAGES=(
     matugen                 # Color theme generator for wallpapers
     alacritty
     vicinae-bin
-    hyprsession             # Hyprland session management
     dracula-gtk-theme
     dracula-icons-git
     nwg-look                # GTK theme selector and customization tool

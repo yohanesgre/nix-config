@@ -38,7 +38,7 @@
 
   # Set to true to enable ROYUAN OLV75 keyboard fnmode fix
   # This fixes function key behavior for ROYUAN keyboards
-  enableRoyuanKeyboard = false;
+  enableRoyuanKeyboard = false; 
 
   # ============================================================================
   # Auto-Installation Behavior
