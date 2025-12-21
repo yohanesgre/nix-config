@@ -27,6 +27,9 @@ DEV_PACKAGES=(
     github-cli  # gh
     btop
     fzf
+    yazi                    # Modern terminal file manager
+    ffmpegthumbnailer       # Video thumbnails for yazi
+    zoxide                  # Smart directory jumper for yazi
 )
 
 # Zsh plugins
@@ -55,6 +58,8 @@ HYPRLAND_PACKAGES=(
     polkit-kde-agent        # Polkit authentication agent
     qt5-wayland             # Qt5 Wayland support
     qt6-wayland             # Qt6 Wayland support
+    qt6ct                   # Qt6 configuration tool
+    kvantum                 # Qt theme engine
     dolphin                 # File manager (from your config)
     swayidle                # Idle management daemon
     swaylock-effects        # Screen locker with effects

@@ -325,6 +325,18 @@ in
       # Add local bin to PATH
       export PATH="$HOME/.local/bin:$PATH"
 
+      ${lib.optionalString isLinux ''
+        # Yazi - smart cd on quit
+        function y() {
+          local tmp="$(mktemp -t "yazi-cwd.XXXXX")"
+          yazi "$@" --cwd-file="$tmp"
+          if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+            cd -- "$cwd"
+          fi
+          rm -f -- "$tmp"
+        }
+      ''}
+
       # Git configuration (set these in your ~/.zshrc.local or similar)
       # export GIT_AUTHOR_EMAIL="your-email@example.com"
       # export GIT_AUTHOR_NAME="Your Name"
