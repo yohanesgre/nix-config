@@ -1,69 +1,40 @@
 #!/usr/bin/env bash
-# Install packages via pacman that are also in Nix config
-# This prevents conflicts between Nix and Arch package management
+# Install packages via pacman that cannot be managed by Nix
+# CLI tools, fonts, and development utilities are now in home.nix
 
 set -e
 
 # Ensure we have access to system binaries
 export PATH="/usr/bin:/usr/sbin:$PATH"
 
-echo "🔧 Installing packages via pacman..."
+echo "🔧 Installing system packages via pacman..."
 
-# Core utilities (likely already installed, but ensuring)
-CORE_PACKAGES=(
-    git
-    curl
-    vim
-    unzip
-    zip
-    xz
-    usbutils  # Provides lsusb for USB device detection
-    flatpak   # System flatpak (not Nix flatpak)
-    base-devel  # Required for building AUR packages
+# System-critical packages
+SYSTEM_PACKAGES=(
+    flatpak      # System flatpak (required for system integration)
+    base-devel   # Required for building AUR packages
 )
 
-# Development tools
-DEV_PACKAGES=(
-    github-cli  # gh
-    btop
-    fzf
-    yazi                    # Modern terminal file manager
-    ffmpegthumbnailer       # Video thumbnails for yazi
-    zoxide                  # Smart directory jumper for yazi
-    tmux
-)
-
-# Zsh plugins
-ZSH_PACKAGES=(
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    zsh-history-substring-search
-)
-
-# Hyprland and Wayland ecosystem
-HYPRLAND_PACKAGES=(
-    hyprland
-    waybar                  # Status bar for Wayland
-    swww                    # Wallpaper daemon with smooth transitions
-    rofi-wayland            # Application launcher (Wayland fork)
-    wlogout                 # Logout menu
-    swaync                  # Sway Notification Center
-    swappy                  # Screenshot annotation tool
-    grim                    # Screenshot tool
-    slurp                   # Screen area selection
-    wl-clipboard            # Wayland clipboard utilities
-    cliphist                # Clipboard history manager
-    brightnessctl           # Brightness control
-    pamixer                 # PulseAudio mixer
-    polkit-kde-agent        # Polkit authentication agent
-    qt5-wayland             # Qt5 Wayland support
-    qt6-wayland             # Qt6 Wayland support
-    qt6ct                   # Qt6 configuration tool
-    kvantum                 # Qt theme engine
-    dolphin                 # File manager (from your config)
-    swayidle                # Idle management daemon
-    swaylock-effects        # Screen locker with effects
-    gsettings-desktop-schemas  # GSettings schemas (required for swaync)
+# Hyprland and Wayland ecosystem (GUI apps and system services)
+WAYLAND_PACKAGES=(
+    hyprland                      # Window manager
+    waybar                        # Status bar for Wayland
+    swww                          # Wallpaper daemon with smooth transitions
+    rofi-wayland                  # Application launcher (Wayland fork)
+    wlogout                       # Logout menu
+    swaync                        # Sway Notification Center
+    swappy                        # Screenshot annotation tool
+    brightnessctl                 # Brightness control (hardware access)
+    pamixer                       # PulseAudio mixer (system audio)
+    polkit-kde-agent              # Polkit authentication agent
+    qt5-wayland                   # Qt5 Wayland support
+    qt6-wayland                   # Qt6 Wayland support
+    qt6ct                         # Qt6 configuration tool
+    kvantum                       # Qt theme engine
+    dolphin                       # File manager GUI
+    swayidle                      # Idle management daemon
+    swaylock-effects              # Screen locker with effects
+    gsettings-desktop-schemas     # GSettings schemas (required for swaync)
 )
 
 # Gaming (optional)
@@ -72,15 +43,6 @@ GAMING_PACKAGES=(
     winetricks
     steam
     protontricks
-)
-
-# Fonts
-FONT_PACKAGES=(
-    ttf-fira-code
-    ttf-font-awesome
-    ttf-firacode-nerd
-    ttf-jetbrains-mono-nerd
-    ttf-meslo-nerd
 )
 
 # AUR packages (requires yay or paru)
@@ -98,24 +60,12 @@ AUR_PACKAGES=(
 )
 
 echo ""
-echo "📦 Installing core utilities..."
-sudo pacman -S --needed --noconfirm "${CORE_PACKAGES[@]}"
+echo "📦 Installing system packages..."
+sudo pacman -S --needed --noconfirm "${SYSTEM_PACKAGES[@]}"
 
 echo ""
-echo "📦 Installing development tools..."
-sudo pacman -S --needed --noconfirm "${DEV_PACKAGES[@]}"
-
-echo ""
-echo "📦 Installing Zsh plugins..."
-sudo pacman -S --needed --noconfirm "${ZSH_PACKAGES[@]}"
-
-echo ""
-echo "📦 Installing Hyprland and Wayland ecosystem..."
-sudo pacman -S --needed --noconfirm "${HYPRLAND_PACKAGES[@]}"
-
-echo ""
-echo "📦 Installing fonts..."
-sudo pacman -S --needed --noconfirm "${FONT_PACKAGES[@]}"
+echo "📦 Installing Wayland ecosystem (compatible with both Hyprland and KDE Plasma)..."
+sudo pacman -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
 
 # Function to install yay
 install_yay() {
@@ -212,8 +162,10 @@ fi
 echo ""
 echo "✅ Package installation complete!"
 echo ""
+echo "ℹ️  Note: CLI tools, fonts, and development utilities are managed by Nix (see home.nix)"
+echo ""
 echo "Next steps:"
-echo "1. Reload Hyprland or logout/login to apply changes"
-echo "2. Test wallpaper switching with Super + Shift + W"
-echo "3. Your wallpaper will auto-load on next Hyprland startup"
+echo "1. Run 'home-manager switch --flake ~/.config/nix#archlinux' to install Nix packages"
+echo "2. Logout/login to apply changes (works with both Hyprland and KDE Plasma)"
+echo "3. If using Hyprland: Test wallpaper switching with Super + Shift + W"
 echo "4. If you installed Discord, restart it to apply app.asar changes"

@@ -59,10 +59,40 @@ in
     zsh-history-substring-search
     zsh-syntax-highlighting
   ] ++ lib.optionals isLinux [
-    # Linux (Arch/CachyOS): Install minimal set via Nix
-    # Most packages should be installed via pacman to avoid conflicts
-    # See docs/PACMAN_PACKAGES.md for the full list
-    # Run: ~/.config/nix/scripts/install-arch-packages.sh
+    # Linux (Arch/CachyOS): CLI tools and utilities via Nix
+    # GUI apps and system packages remain in pacman
+
+    # Core CLI utilities
+    git
+    curl
+    vim
+    unzip
+    zip
+    xz
+    usbutils
+
+    # Development tools
+    gh
+    btop
+    fzf
+    yazi
+    ffmpegthumbnailer
+    zoxide
+    tmux
+
+    # Wayland CLI utilities
+    wl-clipboard
+    cliphist
+    grim
+    slurp
+
+    # Fonts
+    nerd-fonts.fira-code
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.meslo-lg
+    font-awesome
+
+    # Zsh plugins (managed by programs.zsh, but available as packages)
   ] ++ lib.optionals enableFlutter [
     # Flutter development environment
     jdk17
@@ -109,16 +139,15 @@ in
     LESS_TERMCAP_md = "$(tput bold 2> /dev/null; tput setaf 2 2> /dev/null)";
     LESS_TERMCAP_me = "$(tput sgr0 2> /dev/null)";
   } // lib.optionalAttrs isDarwin {
-    # macOS: Use Nix-provided packages
-    FZF_BASE = "${pkgs.fzf}/share/fzf";
+    # macOS-specific settings
     TERMINAL = "ghostty";
   } // lib.optionalAttrs isLinux {
-    # Linux (Arch): Use system packages from pacman
-    FZF_BASE = "/usr/share/fzf";
-    # TERMINAL not set - using system ghostty
-    # Arch Linux integration (from Arch Wiki)
+    # Linux (Arch): Arch Linux integration (from Arch Wiki)
     LOCALE_ARCHIVE = "/usr/lib/locale/locale-archive";
     # Note: XDG_DATA_DIRS is set in zsh initExtra to override system scripts
+  } // {
+    # Cross-platform: Use Nix-provided FZF
+    FZF_BASE = "${pkgs.fzf}/share/fzf";
   } // lib.optionalAttrs enableFlutter {
     # Flutter/Android development environment variables
     JAVA_HOME = "${pkgs.jdk17}";
@@ -306,17 +335,8 @@ in
         export XDG_DATA_DIRS="/usr/local/share:/usr/share:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share"
       ''}
 
-      # Load zsh-history-substring-search
-      ${lib.optionalString isDarwin ''
-        # macOS: Use Nix-provided plugin
-        source ${pkgs.zsh-history-substring-search}/share/zsh-history-substring-search/zsh-history-substring-search.zsh
-      ''}
-      ${lib.optionalString isLinux ''
-        # Linux (Arch): Use system-provided plugin from pacman
-        if [ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]; then
-          source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
-        fi
-      ''}
+      # Load zsh-history-substring-search (Nix-provided on both platforms)
+      source ${pkgs.zsh-history-substring-search}/share/zsh-history-substring-search/zsh-history-substring-search.zsh
 
       # Bind keys for history substring search
       bindkey '^[[A' history-substring-search-up
@@ -325,17 +345,15 @@ in
       # Add local bin to PATH
       export PATH="$HOME/.local/bin:$PATH"
 
-      ${lib.optionalString isLinux ''
-        # Yazi - smart cd on quit
-        function y() {
-          local tmp="$(mktemp -t "yazi-cwd.XXXXX")"
-          yazi "$@" --cwd-file="$tmp"
-          if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-            cd -- "$cwd"
-          fi
-          rm -f -- "$tmp"
-        }
-      ''}
+      # Yazi - smart cd on quit (now using Nix-provided yazi)
+      function y() {
+        local tmp="$(mktemp -t "yazi-cwd.XXXXX")"
+        yazi "$@" --cwd-file="$tmp"
+        if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+          cd -- "$cwd"
+        fi
+        rm -f -- "$tmp"
+      }
 
       # Git configuration (set these in your ~/.zshrc.local or similar)
       # export GIT_AUTHOR_EMAIL="your-email@example.com"
