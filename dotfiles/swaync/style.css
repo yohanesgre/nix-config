@@ -1,182 +1,199 @@
-/* Rosé Pine Theme for SwayNC */
+/* Material Design 3 - Minimalist Theme */
 
 * {
   all: unset;
-  font-family: "JetBrains Mono Nerd Font", "Noto Sans", sans-serif;
-  font-size: 14px;
+  font-family: "JetBrainsMono Nerd Font", "Roboto", sans-serif;
+  font-size: 13px;
 }
 
-/* Rosé Pine color palette */
-@define-color base #191724;
-@define-color surface #1f1d2e;
-@define-color overlay #26233a;
-@define-color muted #6e6a86;
-@define-color subtle #908caa;
-@define-color text #e0def4;
-@define-color love #eb6f92;
-@define-color gold #f6c177;
-@define-color rose #ebbcba;
-@define-color pine #31748f;
-@define-color foam #9ccfd8;
-@define-color iris #c4a7e7;
-@define-color highlight-low #21202e;
-@define-color highlight-med #403d52;
-@define-color highlight-high #524f67;
+/* Material Design 3 colors - Matching waybar */
+@define-color md3-surface rgba(28, 27, 31, 0.95);
+@define-color md3-surface-variant #49454f;
+@define-color md3-surface-container rgba(28, 27, 31, 0.95);
+@define-color md3-surface-container-high rgba(28, 27, 31, 0.95);
+@define-color md3-surface-container-highest rgba(36, 34, 43, 0.95);
+@define-color md3-primary #d0bcff;
+@define-color md3-on-primary #381e72;
+@define-color md3-primary-container #4f378b;
+@define-color md3-on-primary-container #eaddff;
+@define-color md3-secondary #ccc2dc;
+@define-color md3-on-secondary #332d41;
+@define-color md3-error #f2b8b5;
+@define-color md3-on-error #601410;
+@define-color md3-on-surface #e6e1e5;
+@define-color md3-on-surface-variant #cac4d0;
+@define-color md3-outline #938f99;
+@define-color md3-outline-variant #49454f;
 
+/* Notification row */
 .notification-row {
   outline: none;
+  margin: 0;
+  padding: 0;
 }
 
 .notification-row:focus,
 .notification-row:hover {
-  background: @highlight-low;
+  background: rgba(208, 188, 255, 0.05);
 }
 
+/* Notification popup - Compact Material card */
 .notification {
   border-radius: 12px;
-  margin: 6px 12px;
-  box-shadow: 0 0 0 1px @overlay;
+  margin: 4px 6px;
   padding: 0;
-  background: @surface;
+  background: @md3-surface-container-high;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border: 1px solid @md3-outline-variant;
 }
 
 .notification-content {
   background: transparent;
-  padding: 6px;
+  padding: 12px;
   border-radius: 12px;
 }
 
+/* Close button - Minimalist */
 .close-button {
-  background: @love;
-  color: @base;
+  background: transparent;
+  color: @md3-on-surface-variant;
   text-shadow: none;
   padding: 0;
-  border-radius: 100%;
-  margin-top: 10px;
-  margin-right: 16px;
+  border-radius: 50%;
+  margin-top: 8px;
+  margin-right: 8px;
   box-shadow: none;
   border: none;
-  min-width: 24px;
-  min-height: 24px;
+  min-width: 20px;
+  min-height: 20px;
+  transition: all 0.15s ease;
 }
 
 .close-button:hover {
-  box-shadow: none;
-  background: @rose;
-  transition: all 0.15s ease-in-out;
-  border: none;
+  background: rgba(230, 225, 229, 0.08);
+  color: @md3-on-surface;
 }
 
+.close-button:active {
+  background: rgba(230, 225, 229, 0.12);
+}
+
+/* Notification actions - Minimalist */
 .notification-default-action,
 .notification-action {
-  padding: 4px;
-  margin: 0;
+  padding: 6px 12px;
+  margin: 2px;
   box-shadow: none;
-  background: @surface;
-  border: 1px solid @overlay;
-  color: @text;
-  transition: all 0.15s ease-in-out;
+  background: transparent;
+  border: 1px solid @md3-outline-variant;
+  color: @md3-on-surface-variant;
+  border-radius: 6px;
+  font-weight: 400;
+  font-size: 12px;
+  transition: all 0.15s ease;
 }
 
 .notification-default-action:hover,
 .notification-action:hover {
-  -gtk-icon-effect: none;
-  background: @overlay;
+  background: rgba(208, 188, 255, 0.08);
+  color: @md3-primary;
+  border-color: @md3-outline;
 }
 
-.notification-default-action {
-  border-radius: 12px;
+.notification-default-action:active,
+.notification-action:active {
+  background: rgba(208, 188, 255, 0.12);
 }
 
-.notification-default-action:not(:only-child) {
-  border-bottom-left-radius: 7px;
-  border-bottom-right-radius: 7px;
-}
-
-.notification-action {
-  border-radius: 7px;
-  border-top: none;
-  border-right: none;
-}
-
-.notification-action:first-child {
-  border-bottom-left-radius: 10px;
-}
-
-.notification-action:last-child {
-  border-bottom-right-radius: 10px;
-  border-right: 1px solid @overlay;
-}
-
+/* Inline reply */
 .inline-reply {
   margin-top: 8px;
 }
 
 .inline-reply-entry {
-  background: @overlay;
-  color: @text;
-  caret-color: @text;
-  border: 1px solid @highlight-med;
-  border-radius: 12px;
+  background: @md3-surface-container-highest;
+  color: @md3-on-surface;
+  caret-color: @md3-primary;
+  border: 1px solid @md3-outline;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+
+.inline-reply-entry:focus {
+  border-color: @md3-primary;
+  background: @md3-surface-container;
 }
 
 .inline-reply-button {
-  margin-left: 4px;
-  background: @iris;
-  border: 1px solid @overlay;
-  border-radius: 12px;
-  color: @base;
+  margin-left: 8px;
+  background: @md3-primary;
+  border: none;
+  border-radius: 6px;
+  color: @md3-on-primary;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
 }
 
 .inline-reply-button:disabled {
-  background: initial;
-  color: @subtle;
-  border: 1px solid transparent;
+  background: rgba(230, 225, 229, 0.12);
+  color: rgba(230, 225, 229, 0.38);
 }
 
 .inline-reply-button:hover {
-  background: @foam;
+  background: rgba(208, 188, 255, 0.9);
 }
 
-.image {
+.inline-reply-button:active {
+  transform: scale(0.95);
 }
 
+/* Images */
 .body-image {
-  margin-top: 6px;
-  background-color: @base;
-  border-radius: 12px;
+  margin-top: 8px;
+  background-color: @md3-surface;
+  border-radius: 8px;
 }
 
+/* Text elements - Compact */
 .summary {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 500;
   background: transparent;
-  color: @text;
+  color: @md3-on-surface;
   text-shadow: none;
 }
 
 .time {
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 11px;
+  font-weight: 400;
   background: transparent;
-  color: @subtle;
+  color: @md3-on-surface-variant;
   text-shadow: none;
-  margin-right: 18px;
+  margin-right: 10px;
+  opacity: 0.7;
 }
 
 .body {
-  font-size: 14px;
-  font-weight: normal;
+  font-size: 12px;
+  font-weight: 400;
   background: transparent;
-  color: @text;
+  color: @md3-on-surface-variant;
   text-shadow: none;
+  margin-top: 4px;
 }
 
+/* Control Center - Minimalist */
 .control-center {
-  background: @base;
+  background: @md3-surface;
   border-radius: 12px;
-  margin: 18px;
+  margin: 8px;
   padding: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  border: 1px solid @md3-outline-variant;
 }
 
 .control-center-list {
@@ -185,137 +202,203 @@
 
 .control-center-list-placeholder {
   opacity: 0.5;
+  color: @md3-on-surface-variant;
 }
 
+/* Floating notifications container */
 .floating-notifications {
   background: transparent;
 }
 
+/* Blank window background */
 .blank-window {
-  background: alpha(@base, 0.25);
+  background: transparent;
 }
 
+/* Widget title */
 .widget-title {
   margin: 8px;
-  font-size: 1.5rem;
-  color: @text;
+  font-size: 16px;
+  font-weight: 500;
+  color: @md3-on-surface;
 }
 
 .widget-title>button {
-  font-size: initial;
-  color: @text;
+  font-size: 12px;
+  font-weight: 400;
+  color: @md3-on-surface-variant;
   text-shadow: none;
-  background: @surface;
-  border: 1px solid @overlay;
+  background: transparent;
+  border: 1px solid @md3-outline-variant;
   box-shadow: none;
-  border-radius: 12px;
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: all 0.15s ease;
 }
 
 .widget-title>button:hover {
-  background: @overlay;
+  background: rgba(208, 188, 255, 0.08);
+  color: @md3-primary;
+  border-color: @md3-outline;
 }
 
+.widget-title>button:active {
+  background: rgba(208, 188, 255, 0.12);
+}
+
+/* Do Not Disturb widget */
 .widget-dnd {
   margin: 8px;
-  font-size: 1.1rem;
-  color: @text;
+  font-size: 14px;
+  font-weight: 500;
+  color: @md3-on-surface;
 }
 
 .widget-dnd>switch {
-  font-size: initial;
   border-radius: 12px;
-  background: @surface;
-  border: 1px solid @overlay;
+  background: @md3-surface-variant;
+  border: none;
   box-shadow: none;
+  min-width: 48px;
+  min-height: 28px;
 }
 
 .widget-dnd>switch:checked {
-  background: @iris;
+  background: @md3-primary;
 }
 
 .widget-dnd>switch slider {
-  background: @overlay;
+  background: @md3-outline;
   border-radius: 12px;
+  min-width: 20px;
+  min-height: 20px;
+  margin: 4px;
+  transition: all 0.15s ease;
 }
 
 .widget-dnd>switch:checked slider {
-  background: @base;
+  background: @md3-on-primary;
 }
 
+/* Label widget */
 .widget-label {
   margin: 8px;
 }
 
 .widget-label>label {
-  font-size: 1.1rem;
-  color: @text;
+  font-size: 14px;
+  font-weight: 400;
+  color: @md3-on-surface;
 }
 
+/* MPRIS widget */
 .widget-mpris {
-  color: @text;
-  background: @surface;
+  color: @md3-on-surface;
+  background: @md3-surface-container;
 }
 
 .widget-mpris-player {
-  padding: 8px;
-  margin: 8px;
+  padding: 10px;
+  margin: 6px;
   border-radius: 12px;
-  background: @overlay;
+  background: @md3-surface-container-high;
+  border: 1px solid @md3-outline-variant;
 }
 
 .widget-mpris-title {
-  font-weight: bold;
-  font-size: 1.25rem;
+  font-weight: 500;
+  font-size: 14px;
+  color: @md3-on-surface;
 }
 
 .widget-mpris-subtitle {
-  font-size: 1.1rem;
+  font-size: 12px;
+  font-weight: 400;
+  color: @md3-on-surface-variant;
 }
 
+/* Buttons grid widget */
 .widget-buttons-grid {
-  padding: 8px;
-  margin: 8px;
+  padding: 6px;
+  margin: 6px;
   border-radius: 12px;
-  background: @surface;
+  background: @md3-surface-container;
 }
 
 .widget-buttons-grid>flowbox>flowboxchild>button {
   margin: 4px;
-  background: @overlay;
-  border-radius: 12px;
-  color: @text;
+  background: @md3-surface-container-high;
+  border-radius: 8px;
+  color: @md3-on-surface;
+  border: 1px solid @md3-outline-variant;
+  padding: 10px;
+  transition: all 0.15s ease;
 }
 
 .widget-buttons-grid>flowbox>flowboxchild>button:hover {
-  background: @highlight-med;
+  background: @md3-surface-container-highest;
+  box-shadow: 0 1px 3px rgba(208, 188, 255, 0.2);
 }
 
+.widget-buttons-grid>flowbox>flowboxchild>button:active {
+  transform: scale(0.95);
+}
+
+/* Menu bar */
 .widget-menubar>box>.menu-button-bar>button {
   border: none;
   background: transparent;
+  color: @md3-on-surface;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
 }
 
+.widget-menubar>box>.menu-button-bar>button:hover {
+  background: rgba(208, 188, 255, 0.08);
+}
+
+/* Top bar buttons */
 .topbar-buttons>button {
   border: none;
   background: transparent;
+  color: @md3-on-surface;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
 }
 
+.topbar-buttons>button:hover {
+  background: rgba(208, 188, 255, 0.08);
+}
+
+/* Inhibitors widget */
 .widget-inhibitors {
   margin: 8px;
-  font-size: 1.5rem;
-  color: @text;
+  font-size: 14px;
+  font-weight: 500;
+  color: @md3-on-surface;
 }
 
 .widget-inhibitors>button {
-  font-size: initial;
-  color: @text;
+  font-size: 12px;
+  font-weight: 400;
+  color: @md3-on-surface-variant;
   text-shadow: none;
-  background: @surface;
-  border: 1px solid @overlay;
+  background: transparent;
+  border: 1px solid @md3-outline-variant;
   box-shadow: none;
-  border-radius: 12px;
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: all 0.15s ease;
 }
 
 .widget-inhibitors>button:hover {
-  background: @overlay;
+  background: rgba(208, 188, 255, 0.08);
+  color: @md3-primary;
+  border-color: @md3-outline;
+}
+
+.widget-inhibitors>button:active {
+  background: rgba(208, 188, 255, 0.12);
 }
