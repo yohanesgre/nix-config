@@ -89,6 +89,7 @@ AUR_PACKAGES=(
     dracula-gtk-theme
     dracula-icons-git
     nwg-look                # GTK theme selector and customization tool
+    discord                 # Discord client (required for app.asar replacement)
 )
 
 echo ""
@@ -189,9 +190,25 @@ echo "📦 Installing Flatpak applications..."
 flatpak install -y flathub io.github.zen_browser.zen
 
 echo ""
+echo "🎮 Setting up Discord with OpenAsar and theme..."
+if [ -f "$HOME/.local/bin/replace-discord-app-asar" ]; then
+    # Only run if custom app.asar exists
+    if [ -f "$HOME/.config/nix/discord-assets/app.asar" ]; then
+        $HOME/.local/bin/replace-discord-app-asar || echo "⚠️  Discord setup failed"
+    else
+        echo "ℹ️  OpenAsar not found in ~/.config/nix/discord-assets/, skipping Discord customization"
+        echo "   To customize Discord later, place your files in ~/.config/nix/discord-assets/ and run:"
+        echo "   replace-discord-app-asar"
+    fi
+else
+    echo "⚠️  replace-discord-app-asar script not found"
+fi
+
+echo ""
 echo "✅ Package installation complete!"
 echo ""
 echo "Next steps:"
 echo "1. Reload Hyprland or logout/login to apply changes"
 echo "2. Test wallpaper switching with Super + Shift + W"
 echo "3. Your wallpaper will auto-load on next Hyprland startup"
+echo "4. If you installed Discord, restart it to apply app.asar changes"
