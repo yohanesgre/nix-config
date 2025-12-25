@@ -224,6 +224,18 @@ lib.mkIf isLinux {
         "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
       ];
 
+      # Window rules v2 (more powerful matching)
+      windowrulev2 = [
+        # Firefox/Zen Browser Picture-in-Picture
+        "float, title:^(Picture-in-Picture)$"
+        "pin, title:^(Picture-in-Picture)$"
+        "size 25% 25%, title:^(Picture-in-Picture)$"
+        "move 74% 74%, title:^(Picture-in-Picture)$"
+        "keepaspectratio, title:^(Picture-in-Picture)$"
+        "opacity 1.0 override, title:^(Picture-in-Picture)$"
+        "noborder, title:^(Picture-in-Picture)$"
+      ];
+
       # Layer rules
       layerrule = [
         "blur,vicinae"
