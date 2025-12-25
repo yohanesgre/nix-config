@@ -29,6 +29,7 @@ WAYLAND_PACKAGES=(
     polkit-gnome                  # Polkit authentication agent (GTK-based)
     qt5-wayland                   # Qt5 Wayland support (for compatibility)
     qt6-wayland                   # Qt6 Wayland support (for compatibility)
+    qt6ct                         # Qt6 theme configuration tool
     nautilus                      # File manager GUI
     gvfs                          # Virtual filesystem (trash, network shares)
     gvfs-mtp                      # MTP device support (Android phones)

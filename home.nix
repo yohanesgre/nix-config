@@ -22,8 +22,8 @@ let
   freshInstall = userConfig.freshInstall or false;
 in
 {
-  # Import Hyprland configuration on Linux only
-  imports = lib.optionals isLinux [
+  # Import Hyprland configuration (conditional logic is inside hyprland.nix)
+  imports = [
     ./hyprland.nix
   ];
 

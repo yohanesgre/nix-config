@@ -7,6 +7,11 @@ This document details all packages managed by this configuration.
 ### Linux (Arch/CachyOS)
 **Hybrid approach** - split between Nix and pacman:
 
+> **Note**: This configuration supports dual desktop environments (Hyprland + KDE Plasma).
+> - Hyprland-specific packages managed via `install-arch-packages.sh`
+> - KDE Plasma packages (dolphin, polkit-kde-agent, etc.) managed separately
+> - Shared packages: Qt Wayland, system utilities
+
 - **Nix packages** (in `home.nix`):
   - Nix-exclusive tools: `claude-code`, `nix-index`
   - CLI tools: `git`, `curl`, `vim`, `btop`, `fzf`, `yazi`, etc.
@@ -19,7 +24,7 @@ This document details all packages managed by this configuration.
   - Hyprland ecosystem: `hyprland`, `waybar`, `rofi-wayland`, `swaync`, `swww`
   - GUI applications: `nautilus`, `ghostty` (AUR), `vscode` (AUR)
   - Desktop integration: `polkit-gnome`, `gvfs`, `file-roller`
-  - Qt compatibility: `qt5-wayland`, `qt6-wayland`
+  - Qt compatibility: `qt5-wayland`, `qt6-wayland`, `qt6ct`
   - Optional: Gaming packages (Steam, Wine, Protontricks)
 
 ### macOS
@@ -94,6 +99,7 @@ This document details all packages managed by this configuration.
 |---------|--------|-------------|
 | `qt5-wayland` | pacman | Qt5 Wayland support |
 | `qt6-wayland` | pacman | Qt6 Wayland support |
+| `qt6ct` | pacman | Qt6 theme configuration tool |
 
 ### Fonts
 All via Nix on both platforms:
