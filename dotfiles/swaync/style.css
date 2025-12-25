@@ -49,8 +49,20 @@
 
 .notification-content {
   background: transparent;
-  padding: 12px;
+  padding: 8px;
   border-radius: 12px;
+}
+
+/* App icon */
+.notification-icon,
+.app-icon {
+  margin-right: 12px;
+  padding: 0;
+}
+
+/* Icon container if it exists */
+.notification .image {
+  margin-right: 12px;
 }
 
 /* Close button - Minimalist */

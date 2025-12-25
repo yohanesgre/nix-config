@@ -132,7 +132,8 @@ lib.mkIf isLinux {
       "$scriptsDir" = "~/.config/hypr/scripts";
 
       # Monitor configuration
-      monitor = "DP-4,2560x1440@60,0x0,1";
+      # Using auto-detection (empty name) to handle monitor name changes on reload
+      monitor = ",2560x1440@60,auto,1";
 
       # Environment variables
       env = [
