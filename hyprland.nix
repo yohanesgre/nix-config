@@ -236,6 +236,12 @@ lib.mkIf isLinux {
         "opacity 1.0 override, title:^(Picture-in-Picture)$"
         "noborder, title:^(Picture-in-Picture)$"
 
+        # PipeWire Volume Control - floating popup
+        "float, class:^(com.saivert.pwvucontrol)$"
+        "size 360 550, class:^(com.saivert.pwvucontrol)$"
+        "move 100%-450 50, class:^(com.saivert.pwvucontrol)$"
+        "pin, class:^(com.saivert.pwvucontrol)$"
+
         # File picker dialogs (GTK/GNOME)
         "float, class:^(org.gnome.Nautilus)$,title:^(Open)(.*)$"
         "float, class:^(org.gnome.Nautilus)$,title:^(Save)(.*)$"

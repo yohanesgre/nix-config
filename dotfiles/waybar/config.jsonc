@@ -10,7 +10,8 @@
 		"group/workspaces-window"
 	],
 	"modules-center": [
-		"group/clock"
+		"group/clock",
+		"mpris"
 	],
 	"modules-right": [
 		"group/actions",
@@ -28,6 +29,12 @@
 		"orientation": "horizontal",
 		"modules": [
 			"clock"
+		]
+	},
+	"group/media": {
+		"orientation": "horizontal",
+		"modules": [
+			"mpris"
 		]
 	},
 	"group/actions": {
@@ -196,5 +203,29 @@
 	"tray": {
 		"spacing": 8,
 		"show-passive-items": false
+	},
+	"mpris": {
+		"format": "{player_icon} {dynamic}",
+		"format-paused": "{status_icon} <i>{dynamic}</i>",
+		"player-icons": {
+			"default": "\uf001",
+			"spotify": "\uf1bc",
+			"firefox": "\uf269",
+			"chrome": "\uf268",
+			"chromium": "\uf268",
+			"brave": "\ue28b",
+			"vlc": "\uf1f8",
+			"mpv": "\uf03d"
+		},
+		"status-icons": {
+			"paused": "\uf04c"
+		},
+		"dynamic-order": ["title", "artist"],
+		"dynamic-separator": " - ",
+		"max-length": 50,
+		"on-click": "playerctl play-pause",
+		"on-click-right": "playerctl next",
+		"on-scroll-up": "playerctl previous",
+		"on-scroll-down": "playerctl next"
 	}
 }

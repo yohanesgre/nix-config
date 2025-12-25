@@ -55,6 +55,13 @@ box#media {
 	background: rgba(28, 27, 31, 0.95);
 }
 
+box#media.empty {
+	padding: 0;
+	margin: 0;
+	min-width: 0;
+	background: transparent;
+}
+
 box#connectivity {
 	background: rgba(28, 27, 31, 0.95);
 }
@@ -264,6 +271,22 @@ box#tray.empty {
 /* Tray item states */
 box#tray > widget > * {
 	padding: 0 4px;
+}
+
+/* Media player - standalone island */
+#mpris {
+	background: rgba(28, 27, 31, 0.95);
+	border-radius: 12px;
+	margin: 0 3px;
+	padding: 6px 12px;
+	color: #d0bcff;
+	font-weight: 500;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4),
+	            0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+#mpris:hover {
+	background: rgba(38, 37, 41, 0.95);
 }
 
 /* Tooltip styling */
