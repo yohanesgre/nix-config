@@ -1,0 +1,14 @@
+[Unit]
+Description=Idle Scheduler Daemon
+Documentation=Manages hypridle based on time schedules
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/idle-scheduler/idle-scheduler-daemon.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=hyprland-session.target

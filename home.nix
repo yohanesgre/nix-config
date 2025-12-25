@@ -86,6 +86,9 @@ in
     grim
     slurp
 
+    # TUI tools
+    gum
+
     # Fonts
     nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
@@ -103,7 +106,7 @@ in
 
   # Dotfiles management
   home.file = lib.mkMerge [
-    {
+    { 
       # Common files for all platforms
     }
     # Automatically sync all scripts from scripts/ to .local/bin

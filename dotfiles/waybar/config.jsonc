@@ -33,7 +33,7 @@
 	"group/actions": {
 		"orientation": "horizontal",
 		"modules": [
-			"idle_inhibitor",
+			"custom/idle-scheduler",
 			"custom/notification",
 			"custom/power-menu"
 		]
@@ -88,14 +88,13 @@
 		"max-length": 50,
 		"separate-outputs": true
 	},
-	"idle_inhibitor": {
-		"format": "{icon}",
-		"format-icons": {
-			"activated": "󰅶",
-			"deactivated": "󰾪"
-		},
-		"tooltip-format-activated": "Idle inhibitor: ON - System won't sleep",
-		"tooltip-format-deactivated": "Idle inhibitor: OFF - System can sleep"
+	"custom/idle-scheduler": {
+		"format": "{}",
+		"return-type": "json",
+		"interval": 5,
+		"exec": "/bin/bash ~/.config/waybar/scripts/idle-scheduler.sh",
+		"on-click": "/bin/bash ~/.config/waybar/scripts/idle-scheduler.sh toggle",
+		"on-click-right": "/bin/bash ~/.config/waybar/scripts/idle-scheduler.sh config"
 	},
 	"custom/notification": {
 		"tooltip": false,

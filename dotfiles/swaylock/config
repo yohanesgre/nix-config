@@ -1,37 +1,68 @@
+# Material Design Swaylock Configuration
+# Wallpaper background
 image=~/.config/hypr/wallpapers/pexels-simon73-1183099.jpg
+scaling=fill
+
+# General settings
 daemonize
 show-failed-attempts
 clock
-effect-blur=9x5
-effect-vignette=0.5:0.5
-color=1f1d2e80
 font="Inter"
+font-size=24
+
+# Material Design - subtle blur over wallpaper
+effect-blur=7x3
+
+# Indicator settings - smaller, cleaner Material Design style
 indicator
-indicator-radius=200
-indicator-thickness=20
-line-color=1f1d2e
-ring-color=191724
-inside-color=1f1d2e
-key-hl-color=eb6f92
+indicator-radius=120
+indicator-thickness=12
+
+# Material Design color scheme
+# Primary: Material Blue (#2196F3)
+# Error: Material Red (#F44336)
+# Surface: Semi-transparent dark (#00000099)
+
+# Default state
+line-color=00000000
+ring-color=2196F3AA
+inside-color=00000099
+text-color=FFFFFF
 separator-color=00000000
-text-color=e0def4
-text-caps-lock-color=""
-line-ver-color=eb6f92
-ring-ver-color=eb6f92
-inside-ver-color=1f1d2e
-text-ver-color=e0def4
-ring-wrong-color=31748f
-text-wrong-color=31748f
-inside-wrong-color=1f1d2e
-inside-clear-color=1f1d2e
-text-clear-color=e0def4
-ring-clear-color=9ccfd8
-line-clear-color=1f1d2e
-line-wrong-color=1f1d2e
-bs-hl-color=31748f
+
+# Verifying state (Material Blue)
+line-ver-color=00000000
+ring-ver-color=2196F3
+inside-ver-color=00000099
+text-ver-color=FFFFFF
+
+# Wrong password state (Material Red)
+line-wrong-color=00000000
+ring-wrong-color=F44336
+inside-wrong-color=00000099
+text-wrong-color=F44336
+
+# Clearing state (Material Light Blue)
+line-clear-color=00000000
+ring-clear-color=03A9F4
+inside-clear-color=00000099
+text-clear-color=FFFFFF
+
+# Backspace highlight
+bs-hl-color=F44336
+key-hl-color=2196F3
+
+# Caps lock
+text-caps-lock-color=FFC107
+
+# Grace period
 grace=2
 grace-no-mouse
 grace-no-touch
-datestr=%a, %B %e
-timestr=%I:%M %p
-fade-in=0.2
+
+# Time and date - simple format
+datestr=%A, %B %e
+timestr=%H:%M
+
+# Smooth fade in
+fade-in=0.3

@@ -4,6 +4,112 @@ let
   isLinux = pkgs.stdenv.isLinux;
 in
 lib.mkIf isLinux {
+  # Hypridle - idle management daemon for Hyprland
+  services.hypridle = {
+    enable = true;
+    settings = {
+      general = {
+        lock_cmd = "pidof hyprlock || hyprlock";
+        before_sleep_cmd = "loginctl lock-session && sleep 1";
+        after_sleep_cmd = "hyprctl dispatch dpms on";
+        ignore_dbus_inhibit = false;
+      };
+      listener = [
+        {
+          timeout = 1800;  # 30 minutes
+          on-timeout = "hyprctl dispatch dpms off";
+          on-resume = "hyprctl dispatch dpms on";
+        }
+        {
+          timeout = 2100;  # 35 minutes (5 min after display off)
+          on-timeout = "loginctl lock-session";
+        }
+        {
+          timeout = 3600;  # 60 minutes
+          on-timeout = "systemctl suspend";
+        }
+      ];
+    };
+  };
+
+  # Hyprlock - screen lock for Hyprland
+  # Disabled: Using system hyprlock to match system Hyprland
+  programs.hyprlock = {
+    enable = false;
+    settings = {
+      general = {
+        hide_cursor = true;
+      };
+
+      background = [{
+        monitor = "";
+        path = "~/.config/hypr/wallpapers/pexels-simon73-1183099.jpg";
+        blur_passes = 3;
+        blur_size = 7;
+        brightness = 0.8;
+        contrast = 0.9;
+      }];
+
+      label = [
+        # Time
+        {
+          monitor = "";
+          text = ''cmd[update:1000] echo "$(date +"%H:%M")"'';
+          color = "rgb(255, 255, 255)";
+          font_size = 90;
+          font_family = "Inter";
+          position = "0, 200";
+          halign = "center";
+          valign = "center";
+        }
+        # Date
+        {
+          monitor = "";
+          text = ''cmd[update:60000] echo "$(date +"%A, %B %e")"'';
+          color = "rgb(255, 255, 255)";
+          font_size = 24;
+          font_family = "Inter";
+          position = "0, 100";
+          halign = "center";
+          valign = "center";
+        }
+        # User
+        {
+          monitor = "";
+          text = "$USER";
+          color = "rgb(255, 255, 255)";
+          font_size = 16;
+          font_family = "Inter";
+          position = "0, -170";
+          halign = "center";
+          valign = "center";
+        }
+      ];
+
+      input-field = [{
+        monitor = "";
+        size = "300, 50";
+        outline_thickness = 3;
+        dots_size = 0.25;
+        dots_spacing = 0.3;
+        dots_center = true;
+        outer_color = "rgba(33, 150, 243, 0.7)";
+        inner_color = "rgba(0, 0, 0, 0.6)";
+        font_color = "rgb(255, 255, 255)";
+        check_color = "rgb(33, 150, 243)";
+        fail_color = "rgb(244, 67, 54)";
+        fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
+        capslock_color = "rgb(255, 193, 7)";
+        fade_on_empty = true;
+        fade_timeout = 1000;
+        placeholder_text = ''<span foreground="##FFFFFF99">Enter password...</span>'';
+        position = "0, -100";
+        halign = "center";
+        valign = "center";
+      }];
+    };
+  };
+
   # Enable Hyprland window manager
   wayland.windowManager.hyprland = {
     enable = true;
@@ -26,7 +132,7 @@ lib.mkIf isLinux {
       "$scriptsDir" = "~/.config/hypr/scripts";
 
       # Monitor configuration
-      monitor = "DP-4,2560x1440@59.95,0x0,1";
+      monitor = "DP-4,2560x1440@60,0x0,1";
 
       # Environment variables
       env = [
@@ -134,7 +240,7 @@ lib.mkIf isLinux {
         "vicinae server"
         "~/.config/hypr/scripts/wallpaper.sh"
         "swaync"
-        "swayidle"
+        "systemctl --user start idle-scheduler.service"
         "hyprsession"
       ];
 
@@ -165,6 +271,9 @@ lib.mkIf isLinux {
 
         # Notification center
         "$mainMod, N, exec, swaync-client -t -sw"
+
+        # Idle scheduler config
+        "$mainMod SHIFT, I, exec, $terminal -e ~/.config/idle-scheduler/idle-scheduler-config.sh"
 
         # Window management
         "$mainMod, F, fullscreen, 0"
@@ -220,7 +329,7 @@ lib.mkIf isLinux {
         "$mainMod, mouse_up, workspace, e-1"
 
         # Session management
-        "$mainMod SHIFT, L, exec, swaylock -f"
+        "$mainMod SHIFT, L, exec, hyprlock"
         "$mainMod, Escape, exec, wlogout"
       ];
 
@@ -258,7 +367,7 @@ lib.mkIf isLinux {
       # Configuration for Hyprland sessions
       hyprland = {
         default = [ "hyprland" "gtk" ];
-        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "kde" ];
       };
       # Fallback configuration for other sessions (like KDE Plasma)
       common = {
@@ -311,12 +420,6 @@ lib.mkIf isLinux {
     ".config/wlogout/layout".source = ./dotfiles/wlogout/layout;
     ".config/wlogout/style.css".source = ./dotfiles/wlogout/style.css;
 
-    # Swayidle configuration
-    ".config/swayidle/config".source = ./dotfiles/swayidle/config;
-
-    # Swaylock configuration
-    ".config/swaylock/config".source = ./dotfiles/swaylock/config;
-
     # Swappy configuration
     ".config/swappy/config".source = ./dotfiles/swappy/config;
 
@@ -338,5 +441,22 @@ lib.mkIf isLinux {
       source = ./dotfiles/waybar/scripts/power-profile.sh;
       executable = true;
     };
+    ".config/waybar/scripts/idle-scheduler.sh" = {
+      source = ./dotfiles/waybar/scripts/idle-scheduler.sh;
+      executable = true;
+    };
+
+    # Idle scheduler scripts
+    ".config/idle-scheduler/idle-scheduler-daemon.sh" = {
+      source = ./dotfiles/idle-scheduler/idle-scheduler-daemon.sh;
+      executable = true;
+    };
+    ".config/idle-scheduler/idle-scheduler-config.sh" = {
+      source = ./dotfiles/idle-scheduler/idle-scheduler-config.sh;
+      executable = true;
+    };
+
+    # Systemd user services
+    ".config/systemd/user/idle-scheduler.service".source = ./dotfiles/systemd/idle-scheduler.service;
   };
 }

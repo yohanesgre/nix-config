@@ -108,6 +108,7 @@ label#clock {
 
 /* Module labels inside groups */
 label#idle_inhibitor,
+label#custom-idle-scheduler,
 label#custom-notification,
 label#custom-power-menu,
 label#custom-power-profile,
@@ -167,6 +168,7 @@ box#connectivity > box > *:only-child {
 
 /* Hover states - Material state layers */
 label#idle_inhibitor:hover,
+label#custom-idle-scheduler:hover,
 label#custom-notification:hover,
 label#custom-power-menu:hover,
 label#pulseaudio:hover,
@@ -179,11 +181,13 @@ box#tray:hover {
 }
 
 /* Module-specific colors */
-label#idle_inhibitor {
+label#idle_inhibitor,
+label#custom-idle-scheduler {
 	color: #e6e1e5;
 }
 
-label#idle_inhibitor.activated {
+label#idle_inhibitor.activated,
+label#custom-idle-scheduler.activated {
 	color: #e4c068;
 	font-weight: bold;
 }

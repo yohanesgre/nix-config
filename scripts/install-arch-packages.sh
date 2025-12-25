@@ -32,8 +32,8 @@ WAYLAND_PACKAGES=(
     qt6ct                         # Qt6 configuration tool
     kvantum                       # Qt theme engine
     dolphin                       # File manager GUI
-    swayidle                      # Idle management daemon
-    swaylock-effects              # Screen locker with effects
+    hypridle                      # Idle management daemon for Hyprland
+    hyprlock                      # Screen locker for Hyprland
     gsettings-desktop-schemas     # GSettings schemas (required for swaync)
 )
 

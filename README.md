@@ -215,10 +215,8 @@ Git user information is configured via `config.nix`:
     ├── swaync/                 # Notification center
     │   ├── config.json         # SwayNC settings
     │   └── style.css           # SwayNC styling
-    ├── swaylock/               # Screen locker
-    │   └── config
-    ├── swayidle/               # Idle manager
-    │   └── config
+    ├── hypridle/               # Idle manager (reference only)
+    │   └── hypridle.conf       # (actual config managed by home-manager)
     ├── swappy/                 # Screenshot editor
     │   └── config
     └── wlogout/                # Logout menu

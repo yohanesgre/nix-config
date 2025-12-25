@@ -1,5 +1,7 @@
 # Swayidle config for Hyprland
 # Replace swaymsg with hyprctl for Hyprland compatibility
-timeout 300 'swaylock -f'
-timeout 600 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on'
-before-sleep 'swaylock -f'
+# Note: before-sleep locking disabled due to NVIDIA resume issues with swaylock
+timeout 1800 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on'
+timeout 2700 'swaylock -f'
+timeout 3600 'systemctl suspend'
+after-resume 'hyprctl dispatch dpms on'
