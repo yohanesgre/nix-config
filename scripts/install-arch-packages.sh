@@ -26,15 +26,17 @@ WAYLAND_PACKAGES=(
     swappy                        # Screenshot annotation tool
     brightnessctl                 # Brightness control (hardware access)
     pamixer                       # PulseAudio mixer (system audio)
-    polkit-kde-agent              # Polkit authentication agent
-    qt5-wayland                   # Qt5 Wayland support
-    qt6-wayland                   # Qt6 Wayland support
-    qt6ct                         # Qt6 configuration tool
-    kvantum                       # Qt theme engine
-    dolphin                       # File manager GUI
+    polkit-gnome                  # Polkit authentication agent (GTK-based)
+    qt5-wayland                   # Qt5 Wayland support (for compatibility)
+    qt6-wayland                   # Qt6 Wayland support (for compatibility)
+    nautilus                      # File manager GUI
+    gvfs                          # Virtual filesystem (trash, network shares)
+    gvfs-mtp                      # MTP device support (Android phones)
+    gvfs-gphoto2                  # Camera support
+    file-roller                   # Archive manager (for Nautilus integration)
     hypridle                      # Idle management daemon for Hyprland
     hyprlock                      # Screen locker for Hyprland
-    gsettings-desktop-schemas     # GSettings schemas (required for swaync)
+    gsettings-desktop-schemas     # GSettings schemas (required for swaync and Nautilus)
 )
 
 # Gaming (optional)

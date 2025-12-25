@@ -22,8 +22,8 @@ let
   freshInstall = userConfig.freshInstall or false;
 in
 {
-  # Import Hyprland configuration on Linux
-  imports = [
+  # Import Hyprland configuration on Linux only
+  imports = lib.optionals isLinux [
     ./hyprland.nix
   ];
 
@@ -308,7 +308,7 @@ in
       update = "sudo pacman -Syu";
 
       # Cleanup orphaned packages
-      cleanup = "sudo pacman -Rsn $(pacman -Qtdq)";
+      cleanup = "pacman -Qtdq | xargs -r sudo pacman -Rsn";
 
       # Get the error messages from journalctl
       jctl = "journalctl -p 3 -xb";
@@ -323,7 +323,7 @@ in
     };
 
     # Additional zsh configuration
-    initContent = ''
+    initExtra = ''
       # Disable magic functions (from CachyOS config)
       DISABLE_MAGIC_FUNCTIONS="true"
 

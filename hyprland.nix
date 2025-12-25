@@ -125,7 +125,7 @@ lib.mkIf isLinux {
     settings = {
       # Program variables
       "$terminal" = "ghostty";
-      "$fileManager" = "dolphin";
+      "$fileManager" = "nautilus";
       "$menu" = "rofi -show drun";
       "$browser" = "flatpak run app.zen_browser.zen";
       "$mainMod" = "SUPER";
@@ -234,6 +234,13 @@ lib.mkIf isLinux {
         "keepaspectratio, title:^(Picture-in-Picture)$"
         "opacity 1.0 override, title:^(Picture-in-Picture)$"
         "noborder, title:^(Picture-in-Picture)$"
+
+        # File picker dialogs (GTK/GNOME)
+        "float, class:^(org.gnome.Nautilus)$,title:^(Open)(.*)$"
+        "float, class:^(org.gnome.Nautilus)$,title:^(Save)(.*)$"
+        "float, class:^(xdg-desktop-portal-gtk)$"
+        "size 60% 70%, class:^(xdg-desktop-portal-gtk)$"
+        "center, class:^(xdg-desktop-portal-gtk)$"
       ];
 
       # Layer rules
@@ -254,6 +261,7 @@ lib.mkIf isLinux {
         "swaync"
         "systemctl --user start idle-scheduler.service"
         "hyprsession"
+        "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
       ];
 
       # Keybindings
@@ -379,7 +387,7 @@ lib.mkIf isLinux {
       # Configuration for Hyprland sessions
       hyprland = {
         default = [ "hyprland" "gtk" ];
-        "org.freedesktop.impl.portal.FileChooser" = [ "kde" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
       };
       # Fallback configuration for other sessions (like KDE Plasma)
       common = {
