@@ -82,7 +82,7 @@ This document details all packages managed by this configuration.
 |---------|--------|-------------|
 | `polkit-gnome` | pacman | Authentication agent |
 | `brightnessctl` | pacman | Brightness control |
-| `pamixer` | pacman | Audio mixer |
+| `pwvucontrol` | pacman | PipeWire volume control GUI |
 | `swww` | pacman | Wallpaper daemon |
 | `swappy` | pacman | Screenshot annotation |
 

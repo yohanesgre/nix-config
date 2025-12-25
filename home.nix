@@ -164,8 +164,12 @@ in
 
   programs.git = {
     enable = true;
-    userName = userConfig.gitUserName or "";
-    userEmail = userConfig.gitUserEmail or "";
+    settings = {
+      user = {
+        name = userConfig.gitUserName or "";
+        email = userConfig.gitUserEmail or "";
+      };
+    };
   };
 
   programs.nix-index = {
@@ -323,7 +327,7 @@ in
     };
 
     # Additional zsh configuration
-    initExtra = ''
+    initContent = ''
       # Disable magic functions (from CachyOS config)
       DISABLE_MAGIC_FUNCTIONS="true"
 
@@ -374,6 +378,12 @@ in
           fi
         ''}
       ''}
+
+      # Source local zsh configuration if it exists
+      # This allows user-specific customizations that won't be managed by Nix
+      if [ -f "$HOME/.zshrc.local" ]; then
+        source "$HOME/.zshrc.local"
+      fi
     '';
   };
 

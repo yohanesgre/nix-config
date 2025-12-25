@@ -25,7 +25,7 @@ WAYLAND_PACKAGES=(
     swaync                        # Sway Notification Center
     swappy                        # Screenshot annotation tool
     brightnessctl                 # Brightness control (hardware access)
-    pamixer                       # PulseAudio mixer (system audio)
+    pwvucontrol                   # PipeWire volume control GUI (native)
     polkit-gnome                  # Polkit authentication agent (GTK-based)
     qt5-wayland                   # Qt5 Wayland support (for compatibility)
     qt6-wayland                   # Qt6 Wayland support (for compatibility)
