@@ -62,6 +62,13 @@ AUR_PACKAGES=(
     hyprsession
 )
 
+# Python runtime and dev tools
+PYTHON_PACKAGES=(
+    python
+    python-pip
+    uv                          # Fast Python package installer and resolver
+)
+
 echo ""
 echo "📦 Installing system packages..."
 sudo pacman -S --needed --noconfirm "${SYSTEM_PACKAGES[@]}"
@@ -69,6 +76,10 @@ sudo pacman -S --needed --noconfirm "${SYSTEM_PACKAGES[@]}"
 echo ""
 echo "📦 Installing Wayland ecosystem (compatible with both Hyprland and KDE Plasma)..."
 sudo pacman -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
+
+echo ""
+echo "📦 Installing Python packages..."
+sudo pacman -S --needed --noconfirm "${PYTHON_PACKAGES[@]}"
 
 # Function to install yay
 install_yay() {
