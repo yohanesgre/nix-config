@@ -8,8 +8,21 @@ export PATH="/usr/bin:/usr/sbin:$PATH"
 echo "=== SSH Key Setup ==="
 echo
 
-# Prompt for email comment
-read -p "Enter email for SSH key comment (e.g., 'yohanes@linux-desktop'): " EMAIL
+# Try to get email from git config, otherwise prompt
+DEFAULT_EMAIL=$(git config --global user.email 2>/dev/null || true)
+
+if [ -n "$DEFAULT_EMAIL" ]; then
+    echo "Found git email: $DEFAULT_EMAIL"
+    read -p "Use this email? [Y/n]: " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        read -p "Enter email for SSH key: " EMAIL
+    else
+        EMAIL="$DEFAULT_EMAIL"
+    fi
+else
+    read -p "Enter email for SSH key comment (e.g., 'yohanes@linux-desktop'): " EMAIL
+fi
 
 if [ -z "$EMAIL" ]; then
     echo "Error: Email cannot be empty"

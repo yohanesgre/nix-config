@@ -38,6 +38,7 @@ WAYLAND_PACKAGES=(
     hypridle                      # Idle management daemon for Hyprland
     hyprlock                      # Screen locker for Hyprland
     gsettings-desktop-schemas     # GSettings schemas (required for swaync and Nautilus)
+    wf-recorder			  # Screen recording
 )
 
 # Gaming (optional)

@@ -1,7 +1,14 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 
 let
   isLinux = pkgs.stdenv.isLinux;
+
+  configFile = ./config.nix;
+  userConfig = if builtins.pathExists configFile
+    then import configFile
+    else {};
+
+  hyprlandMouseName = userConfig.hyprlandMouseName or null;
 in
 lib.mkIf isLinux {
   # Hypridle - idle management daemon for Hyprland
@@ -16,99 +23,20 @@ lib.mkIf isLinux {
       };
       listener = [
         {
-          timeout = 1800;  # 30 minutes
+          timeout = 600;  # 10 minutes
           on-timeout = "hyprctl dispatch dpms off";
           on-resume = "hyprctl dispatch dpms on";
         }
         {
-          timeout = 2100;  # 35 minutes (5 min after display off)
+          timeout = 900;  # 15 minutes
           on-timeout = "loginctl lock-session";
-        }
-        {
-          timeout = 3600;  # 60 minutes
-          on-timeout = "systemctl suspend";
         }
       ];
     };
   };
 
   # Hyprlock - screen lock for Hyprland
-  # Disabled: Using system hyprlock to match system Hyprland
-  programs.hyprlock = {
-    enable = false;
-    settings = {
-      general = {
-        hide_cursor = true;
-      };
-
-      background = [{
-        monitor = "";
-        path = "~/.config/hypr/wallpapers/pexels-simon73-1183099.jpg";
-        blur_passes = 3;
-        blur_size = 7;
-        brightness = 0.8;
-        contrast = 0.9;
-      }];
-
-      label = [
-        # Time
-        {
-          monitor = "";
-          text = ''cmd[update:1000] echo "$(date +"%H:%M")"'';
-          color = "rgb(255, 255, 255)";
-          font_size = 90;
-          font_family = "Inter";
-          position = "0, 200";
-          halign = "center";
-          valign = "center";
-        }
-        # Date
-        {
-          monitor = "";
-          text = ''cmd[update:60000] echo "$(date +"%A, %B %e")"'';
-          color = "rgb(255, 255, 255)";
-          font_size = 24;
-          font_family = "Inter";
-          position = "0, 100";
-          halign = "center";
-          valign = "center";
-        }
-        # User
-        {
-          monitor = "";
-          text = "$USER";
-          color = "rgb(255, 255, 255)";
-          font_size = 16;
-          font_family = "Inter";
-          position = "0, -170";
-          halign = "center";
-          valign = "center";
-        }
-      ];
-
-      input-field = [{
-        monitor = "";
-        size = "300, 50";
-        outline_thickness = 3;
-        dots_size = 0.25;
-        dots_spacing = 0.3;
-        dots_center = true;
-        outer_color = "rgba(33, 150, 243, 0.7)";
-        inner_color = "rgba(0, 0, 0, 0.6)";
-        font_color = "rgb(255, 255, 255)";
-        check_color = "rgb(33, 150, 243)";
-        fail_color = "rgb(244, 67, 54)";
-        fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
-        capslock_color = "rgb(255, 193, 7)";
-        fade_on_empty = true;
-        fade_timeout = 1000;
-        placeholder_text = ''<span foreground="##FFFFFF99">Enter password...</span>'';
-        position = "0, -100";
-        halign = "center";
-        valign = "center";
-      }];
-    };
-  };
+  # Managed by system Hyprland package
 
   # Enable Hyprland window manager
   wayland.windowManager.hyprland = {
@@ -155,10 +83,9 @@ lib.mkIf isLinux {
         };
       };
 
-      # Device-specific configuration
-      device = {
-        name = "epic-mouse-v1";
-        sensitivity = -0.5;
+      # Device-specific configuration (from config.nix)
+      device = lib.mkIf (hyprlandMouseName != null) {
+        name = hyprlandMouseName;
       };
 
       # General settings
@@ -219,49 +146,38 @@ lib.mkIf isLinux {
         disable_hyprland_logo = true;
       };
 
-      # Window rules
+      # Window rules (v0.53+ syntax - anonymous format)
       windowrule = [
-        "suppressevent maximize, class:.*"
-        "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
-      ];
+        # Suppress maximize events for all windows
+        "match:class .*, suppress_event maximize"
 
-      # Window rules v2 (more powerful matching)
-      windowrulev2 = [
+        # Prevent focus on empty XWayland windows
+        "match:class ^$, match:title ^$, match:xwayland true, match:float true, match:fullscreen false, match:pin false, no_initial_focus on"
+
         # Firefox/Zen Browser Picture-in-Picture
-        "float, title:^(Picture-in-Picture)$"
-        "pin, title:^(Picture-in-Picture)$"
-        "size 25% 25%, title:^(Picture-in-Picture)$"
-        "move 74% 74%, title:^(Picture-in-Picture)$"
-        "keepaspectratio, title:^(Picture-in-Picture)$"
-        "opacity 1.0 override, title:^(Picture-in-Picture)$"
-        "noborder, title:^(Picture-in-Picture)$"
+        "match:title ^(Picture-in-Picture)$, float on, pin on, size 25% 25%, move 74% 74%, keep_aspect_ratio on, opacity 1.0 override, border_size 0"
 
         # PipeWire Volume Control - floating popup
-        "float, class:^(com.saivert.pwvucontrol)$"
-        "size 360 550, class:^(com.saivert.pwvucontrol)$"
-        "move 100%-450 50, class:^(com.saivert.pwvucontrol)$"
-        "pin, class:^(com.saivert.pwvucontrol)$"
+        "match:class ^(com.saivert.pwvucontrol)$, float on, size 360 550, move 100%-450 50, pin on"
 
         # File picker dialogs (GTK/GNOME)
-        "float, class:^(org.gnome.Nautilus)$,title:^(Open)(.*)$"
-        "float, class:^(org.gnome.Nautilus)$,title:^(Save)(.*)$"
-        "float, class:^(xdg-desktop-portal-gtk)$"
-        "size 60% 70%, class:^(xdg-desktop-portal-gtk)$"
-        "center, class:^(xdg-desktop-portal-gtk)$"
+        "match:class ^(org.gnome.Nautilus)$, match:title ^(Open|Save)(.*)$, float on"
+        "match:class ^(xdg-desktop-portal-gtk)$, float on, size 60% 70%, center on"
       ];
 
-      # Layer rules
+      # Layer rules (v0.53+ syntax - anonymous format)
       layerrule = [
-        "blur,vicinae"
-        "ignorealpha 0, vicinae"
-        "noanim, vicinae"
-        "noanim, wlogout"
-        "blur, wlogout"
-        "ignorealpha 0.2, wlogout"
+        "match:namespace vicinae, blur on"
+        "match:namespace vicinae, ignore_alpha 0"
+        "match:namespace vicinae, no_anim on"
+        "match:namespace wlogout, blur on"
+        "match:namespace wlogout, ignore_alpha 0.2"
+        "match:namespace wlogout, no_anim on"
       ];
 
       # Autostart
       exec-once = [
+        "~/.config/hypr/scripts/setup-rapl-permissions.sh"
         "waybar"
         "vicinae server"
         "~/.config/hypr/scripts/wallpaper.sh"
@@ -292,6 +208,11 @@ lib.mkIf isLinux {
         ", Print, exec, grim - | swappy -f -"
         "$mainMod, Print, exec, grim -g \"$(slurp)\" - | swappy -f -"
         "$mainMod SHIFT, Print, exec, grim -g \"$(slurp)\" - | wl-copy"
+
+        # Screen Capture
+        "$mainMod CTRL, Print, exec, $scriptsDir/screen-record.sh screen"
+        "$mainMod ALT, Print, exec, $scriptsDir/screen-record.sh region"
+        "$mainMod ALT, R, exec, killall -s SIGINT wf-recorder"
 
         # Display resolution picker
         "$mainMod SHIFT, D, exec, $scriptsDir/display-picker.sh"
@@ -426,6 +347,10 @@ lib.mkIf isLinux {
     };
 
     # Scripts
+    ".config/hypr/scripts/setup-rapl-permissions.sh" = {
+      source = ./scripts/setup-rapl-permissions.sh;
+      executable = true;
+    };
     ".config/hypr/scripts/wallpaper.sh" = {
       source = ./dotfiles/hypr/scripts/wallpaper.sh;
       executable = true;
@@ -440,6 +365,10 @@ lib.mkIf isLinux {
     };
     ".config/hypr/scripts/display-picker.sh" = {
       source = ./dotfiles/hypr/scripts/display-picker.sh;
+      executable = true;
+    };
+    ".config/hypr/scripts/screen-record.sh" = {
+      source = ./dotfiles/hypr/scripts/screen-record.sh;
       executable = true;
     };
 

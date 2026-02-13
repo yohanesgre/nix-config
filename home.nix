@@ -147,7 +147,6 @@ in
   } // lib.optionalAttrs isLinux {
     # Linux (Arch): Arch Linux integration (from Arch Wiki)
     LOCALE_ARCHIVE = "/usr/lib/locale/locale-archive";
-    # Note: XDG_DATA_DIRS is set in zsh initExtra to override system scripts
   } // {
     # Cross-platform: Use Nix-provided FZF
     FZF_BASE = "${pkgs.fzf}/share/fzf";
@@ -298,9 +297,7 @@ in
       n = "ninja";
 
       # Home-manager shortcuts (platform-aware)
-      hm = if isLinux
-        then "home-manager switch --flake ~/.config/nix#archlinux"
-        else "home-manager switch --flake ~/.config/nix#macos";
+      hm = "home-manager switch --flake ~/.config/nix#default";
       hme = "$EDITOR ~/.config/nix/home.nix";
     } // lib.optionalAttrs isLinux {
       # Linux-only aliases (from CachyOS config)
@@ -348,8 +345,8 @@ in
       source ${pkgs.zsh-history-substring-search}/share/zsh-history-substring-search/zsh-history-substring-search.zsh
 
       # Bind keys for history substring search
-      bindkey '^[[A' history-substring-search-up
-      bindkey '^[[B' history-substring-search-down
+      bindkey "$terminfo[kup]" history-substring-search-up
+      bindkey "$terminfo[kdown]" history-substring-search-down
 
       # Add local bin to PATH
       export PATH="$HOME/.local/bin:$PATH"

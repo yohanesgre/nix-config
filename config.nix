@@ -42,7 +42,12 @@
 
   # Set to true to enable ROYUAN OLV75 keyboard fnmode fix
   # This fixes function key behavior for ROYUAN keyboards
-  enableRoyuanKeyboard = false; 
+  enableRoyuanKeyboard = false;
+
+  # Mouse device name for Hyprland
+  # Run 'hyprctl devices' to find your mouse name
+  # Comment out or set to null to disable device-specific configuration
+  hyprlandMouseName = "epic-mouse-v1"; 
 
   # ============================================================================
   # Auto-Installation Behavior

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Setup Intel RAPL permissions for power monitoring
 # This allows reading CPU power consumption without sudo
 

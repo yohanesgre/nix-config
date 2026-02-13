@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Android SDK Setup Script for Nix
 # This script sets up the Android SDK for Flutter development

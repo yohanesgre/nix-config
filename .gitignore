@@ -5,3 +5,6 @@ result-*
 # Backup files
 *.backup
 *~
+
+# Local zsh configuration
+.zshrc.local

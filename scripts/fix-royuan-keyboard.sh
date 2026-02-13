@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # ROYUAN OLV75 Keyboard Fix Script
 # This script fixes the fnmode issue for the ROYUAN OLV75 keyboard
