@@ -344,9 +344,13 @@ in
       # Load zsh-history-substring-search (Nix-provided on both platforms)
       source ${pkgs.zsh-history-substring-search}/share/zsh-history-substring-search/zsh-history-substring-search.zsh
 
-      # Bind keys for history substring search
-      bindkey "$terminfo[kup]" history-substring-search-up
-      bindkey "$terminfo[kdown]" history-substring-search-down
+      # Bind keys for history substring search (only if terminfo values exist)
+      if [[ -n "$terminfo[kup]" ]]; then
+        bindkey "$terminfo[kup]" history-substring-search-up
+      fi
+      if [[ -n "$terminfo[kdown]" ]]; then
+        bindkey "$terminfo[kdown]" history-substring-search-down
+      fi
 
       # Add local bin to PATH
       export PATH="$HOME/.local/bin:$PATH"
